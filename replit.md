@@ -1,7 +1,7 @@
-# QBIDS.KG - Live Penny Auction Platform
+# QBIDS.GE - Live Penny Auction Platform
 
 ## Overview
-A real-time penny auction platform built for the Kyrgyzstan market. Users can participate in live auctions for electronics and other items, with real-time bidding powered by WebSocket technology.
+A real-time penny auction platform built for the Georgian market. Users can participate in live auctions for electronics and other items, with real-time bidding powered by WebSocket technology.
 
 ## Project Type
 Full-stack web application with React frontend and Express backend
@@ -60,6 +60,15 @@ Database schema is managed with Drizzle ORM. The schema includes:
 - `bot_settings` - Bot configuration
 
 ## Recent Changes
+- **2025-10-29**: Complete Georgian localization
+  - Updated all page titles, meta tags, and SEO content to Georgian language
+  - Changed default language from Russian to Georgian (ka) across entire application
+  - Updated database settings: currency ₾ (Georgian Lari), Georgian contact info
+  - Updated index.html with Georgian SEO meta tags for QBIDS.GE
+  - Changed site domain from QBIDS.KG to QBIDS.GE throughout
+  - Translation keys added for all UI elements (footer, stats, trust indicators)
+  - Database configured with Georgian defaults: language=ka, contact info (Tbilisi, +995 593 09 00 00)
+  
 - **2025-10-29**: Initial Replit setup
   - Installed all dependencies
   - Pushed database schema to PostgreSQL
@@ -68,8 +77,11 @@ Database schema is managed with Drizzle ORM. The schema includes:
   - Verified application runs successfully
 
 ## Notes
-- The application is configured for Kyrgyzstan timezone (Asia/Bishkek)
-- Default language is Russian, with English and Georgian support
+- The application is configured for Georgian timezone (Asia/Tbilisi)
+- Default language is Georgian (ka), with English and Russian support
+- Currency: Georgian Lari (₾), bid price 0.20 GEL per bid
+- Contact: support@qbids.ge, info@qbids.ge, +995 593 09 00 00, Tbilisi
+- Site name: QBIDS.GE with tagline "პენი-აუქციონები საქართველოში"
 - Uses session-based authentication (no JWT)
 - WebSocket for real-time features (Socket.IO)
-- Vite warnings about duplicate keys in i18n file are non-critical
+- SEO optimized for Georgian market with ka_GE locale
