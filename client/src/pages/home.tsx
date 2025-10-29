@@ -410,7 +410,7 @@ export default function Home() {
             {/* Live Auctions Section */}
             <div className="mb-8">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-900">
                   <i className="fas fa-circle text-red-500 mr-2 animate-pulse"></i>
                   {t("liveAuctions")}
                 </h2>
@@ -442,7 +442,7 @@ export default function Home() {
 
             {/* Upcoming Auctions Section */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-6">
                 <i className="fas fa-clock text-yellow-500 mr-2"></i>
                 {t("upcomingAuctions")}
               </h2>
@@ -489,7 +489,7 @@ export default function Home() {
 
             {/* Today's Winners Section */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-6">
                 <i className="fas fa-trophy text-yellow-500 mr-2"></i>
                 {t("winnersOfTheDay")}
               </h2>
