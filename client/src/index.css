@@ -21,48 +21,87 @@
 @tailwind utilities;
 
 :root {
-  --background: hsl(0, 0%, 100%);
-  --foreground: hsl(20, 14.3%, 4.1%);
-  --muted: hsl(60, 4.8%, 95.9%);
-  --muted-foreground: hsl(25, 5.3%, 44.7%);
-  --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(20, 14.3%, 4.1%);
-  --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(20, 14.3%, 4.1%);
-  --border: hsl(20, 5.9%, 90%);
-  --input: hsl(20, 5.9%, 90%);
-  --primary: hsl(207, 90%, 54%);
-  --primary-foreground: hsl(211, 100%, 99%);
-  --secondary: hsl(60, 4.8%, 95.9%);
-  --secondary-foreground: hsl(24, 9.8%, 10%);
-  --accent: hsl(60, 4.8%, 95.9%);
-  --accent-foreground: hsl(24, 9.8%, 10%);
-  --destructive: hsl(0, 84.2%, 60.2%);
-  --destructive-foreground: hsl(60, 9.1%, 97.8%);
-  --ring: hsl(20, 14.3%, 4.1%);
+  /* Deep Dark Base - Rich charcoal with purple undertones */
+  --background: hsl(245, 20%, 8%);
+  --foreground: hsl(0, 0%, 98%);
+  
+  /* Muted tones with better visibility */
+  --muted: hsl(245, 15%, 15%);
+  --muted-foreground: hsl(240, 8%, 70%);
+  
+  /* Popover and Cards - Slightly lighter for depth */
+  --popover: hsl(245, 18%, 12%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(245, 18%, 12%);
+  --card-foreground: hsl(0, 0%, 98%);
+  
+  /* Borders with subtle glow */
+  --border: hsl(245, 15%, 20%);
+  --input: hsl(245, 15%, 18%);
+  
+  /* Vibrant Primary - Electric Blue/Purple gradient feel */
+  --primary: hsl(250, 85%, 60%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  
+  /* Secondary - Deep purple */
+  --secondary: hsl(260, 30%, 25%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  
+  /* Accent - Cyan/Teal pop */
+  --accent: hsl(190, 85%, 50%);
+  --accent-foreground: hsl(245, 20%, 10%);
+  
+  /* Gold/Yellow for highlights */
+  --warning: hsl(45, 95%, 55%);
+  --warning-foreground: hsl(245, 20%, 10%);
+  
+  /* Destructive - Vibrant Red */
+  --destructive: hsl(0, 85%, 58%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  
+  /* Success - Emerald Green */
+  --success: hsl(150, 65%, 50%);
+  --success-foreground: hsl(245, 20%, 10%);
+  
+  --ring: hsl(250, 85%, 60%);
   --radius: 0.5rem;
 }
 
 .dark {
-  --background: hsl(240, 10%, 3.9%);
+  /* Even Deeper Dark Mode - Near black with rich undertones */
+  --background: hsl(245, 25%, 5%);
   --foreground: hsl(0, 0%, 98%);
-  --muted: hsl(240, 3.7%, 15.9%);
-  --muted-foreground: hsl(240, 5%, 64.9%);
-  --popover: hsl(240, 10%, 3.9%);
+  
+  --muted: hsl(245, 20%, 12%);
+  --muted-foreground: hsl(240, 10%, 65%);
+  
+  --popover: hsl(245, 22%, 8%);
   --popover-foreground: hsl(0, 0%, 98%);
-  --card: hsl(240, 10%, 3.9%);
+  --card: hsl(245, 22%, 8%);
   --card-foreground: hsl(0, 0%, 98%);
-  --border: hsl(240, 3.7%, 15.9%);
-  --input: hsl(240, 3.7%, 15.9%);
-  --primary: hsl(207, 90%, 54%);
-  --primary-foreground: hsl(211, 100%, 99%);
-  --secondary: hsl(240, 3.7%, 15.9%);
+  
+  --border: hsl(245, 20%, 18%);
+  --input: hsl(245, 20%, 15%);
+  
+  --primary: hsl(250, 90%, 65%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  
+  --secondary: hsl(260, 35%, 22%);
   --secondary-foreground: hsl(0, 0%, 98%);
-  --accent: hsl(240, 3.7%, 15.9%);
-  --accent-foreground: hsl(0, 0%, 98%);
-  --destructive: hsl(0, 62.8%, 30.6%);
-  --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(240, 4.9%, 83.9%);
+  
+  --accent: hsl(190, 90%, 55%);
+  --accent-foreground: hsl(245, 25%, 8%);
+  
+  --warning: hsl(45, 98%, 60%);
+  --warning-foreground: hsl(245, 25%, 8%);
+  
+  --destructive: hsl(0, 88%, 62%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  
+  --success: hsl(150, 70%, 55%);
+  --success-foreground: hsl(245, 25%, 8%);
+  
+  --ring: hsl(250, 90%, 65%);
   --radius: 0.5rem;
 }
 
