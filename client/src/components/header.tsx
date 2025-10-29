@@ -65,7 +65,7 @@ export function Header() {
                 <i className="fas fa-gavel text-white text-lg"></i>
               </div>
               <div className="hidden sm:block">
-                <h1 className="text-2xl font-bold text-blue-600">
+                <h1 className="text-2xl font-bold text-white">
                   {settings?.siteName || "QBIDS.GE"}
                 </h1>
                 <p className="text-xs text-gray-300">
@@ -73,7 +73,7 @@ export function Header() {
                 </p>
               </div>
               <div className="sm:hidden">
-                <h1 className="text-xl font-bold text-blue-600">{settings?.siteName || "QBIDS.GE"}</h1>
+                <h1 className="text-xl font-bold text-white">{settings?.siteName || "QBIDS.GE"}</h1>
               </div>
             </Link>
 

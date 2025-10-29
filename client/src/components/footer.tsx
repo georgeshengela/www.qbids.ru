@@ -15,7 +15,7 @@ export function Footer() {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <i className="fas fa-gavel text-white text-sm"></i>
               </div>
-              <h3 className="text-xl font-bold text-blue-600">
+              <h3 className="text-xl font-bold text-white">
                 {settings?.siteName || "QBIDS.GE"}
               </h3>
             </div>
