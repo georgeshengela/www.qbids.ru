@@ -12,11 +12,11 @@ export function Footer() {
           {/* Company Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <i className="fas fa-gavel text-white text-sm"></i>
               </div>
-              <h3 className="text-xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
-                {settings?.siteName || "QBIDS.KG"}
+              <h3 className="text-xl font-bold text-blue-600">
+                {settings?.siteName || "QBIDS.GE"}
               </h3>
             </div>
             <p className="text-gray-300 text-sm leading-relaxed">
@@ -40,29 +40,29 @@ export function Footer() {
 
           {/* Quick Links */}
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-yellow-400">{t("quickLinks")}</h4>
+            <h4 className="text-lg font-semibold text-blue-400">{t("quickLinks")}</h4>
             <ul className="space-y-2">
               <li>
                 <Link href="/" className="text-gray-300 hover:text-white transition-colors text-sm flex items-center">
-                  <i className="fas fa-home mr-2 text-yellow-400"></i>
+                  <i className="fas fa-home mr-2 text-blue-400"></i>
                   {t("home")}
                 </Link>
               </li>
               <li>
                 <Link href="/auctions" className="text-gray-300 hover:text-white transition-colors text-sm flex items-center">
-                  <i className="fas fa-gavel mr-2 text-yellow-400"></i>
+                  <i className="fas fa-gavel mr-2 text-blue-400"></i>
                   {t("auctions")}
                 </Link>
               </li>
               <li>
                 <Link href="/how-it-works" className="text-gray-300 hover:text-white transition-colors text-sm flex items-center">
-                  <i className="fas fa-question-circle mr-2 text-yellow-400"></i>
+                  <i className="fas fa-question-circle mr-2 text-blue-400"></i>
                   {t("howItWorks")}
                 </Link>
               </li>
               <li>
                 <Link href="/topup" className="text-gray-300 hover:text-white transition-colors text-sm flex items-center">
-                  <i className="fas fa-credit-card mr-2 text-yellow-400"></i>
+                  <i className="fas fa-credit-card mr-2 text-blue-400"></i>
                   {t("topUpBalance")}
                 </Link>
               </li>
@@ -71,29 +71,29 @@ export function Footer() {
 
           {/* Support */}
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-yellow-400">{t("support")}</h4>
+            <h4 className="text-lg font-semibold text-blue-400">{t("support")}</h4>
             <ul className="space-y-2">
               <li>
                 <Link href="/support" className="text-gray-300 hover:text-white transition-colors text-sm flex items-center">
-                  <i className="fas fa-headset mr-2 text-yellow-400"></i>
+                  <i className="fas fa-headset mr-2 text-blue-400"></i>
                   {t("customerSupport")}
                 </Link>
               </li>
               <li>
                 <Link href="/auction-rules" className="text-gray-300 hover:text-white transition-colors text-sm flex items-center">
-                  <i className="fas fa-file-alt mr-2 text-yellow-400"></i>
+                  <i className="fas fa-file-alt mr-2 text-blue-400"></i>
                   {t("auctionRules")}
                 </Link>
               </li>
               <li>
                 <Link href="/privacy-policy" className="text-gray-300 hover:text-white transition-colors text-sm flex items-center">
-                  <i className="fas fa-shield-alt mr-2 text-yellow-400"></i>
+                  <i className="fas fa-shield-alt mr-2 text-blue-400"></i>
                   {t("privacyPolicy")}
                 </Link>
               </li>
               <li>
                 <Link href="/terms-of-service" className="text-gray-300 hover:text-white transition-colors text-sm flex items-center">
-                  <i className="fas fa-balance-scale mr-2 text-yellow-400"></i>
+                  <i className="fas fa-balance-scale mr-2 text-blue-400"></i>
                   {t("termsOfService")}
                 </Link>
               </li>
@@ -106,7 +106,7 @@ export function Footer() {
                   }}
                   className="text-gray-300 hover:text-white transition-colors text-sm flex items-center"
                 >
-                  <i className="fas fa-cookie-bite mr-2 text-yellow-400"></i>
+                  <i className="fas fa-cookie-bite mr-2 text-blue-400"></i>
                   {t("cookieSettings")}
                 </button>
               </li>
@@ -115,22 +115,22 @@ export function Footer() {
 
           {/* Contact */}
           <div className="space-y-4">
-            <h4 className="text-lg font-semibold text-yellow-400">{t("contactUs")}</h4>
+            <h4 className="text-lg font-semibold text-blue-400">{t("contactUs")}</h4>
             <div className="space-y-3">
               <div className="flex items-center text-gray-300 text-sm">
-                <i className="fas fa-map-marker-alt mr-3 text-yellow-400"></i>
-                <span>{settings?.contactAddress || "г. Бишкек, ул. Чуй 154"}</span>
+                <i className="fas fa-map-marker-alt mr-3 text-blue-400"></i>
+                <span>{settings?.contactAddress || "თბილისი, საქართველო"}</span>
               </div>
               <div className="flex items-center text-gray-300 text-sm">
-                <i className="fas fa-phone mr-3 text-yellow-400"></i>
-                <span>{settings?.contactPhone || "+996 (555) 123-456"}</span>
+                <i className="fas fa-phone mr-3 text-blue-400"></i>
+                <span>{settings?.contactPhone || "+995 593 09 00 00"}</span>
               </div>
               <div className="flex items-center text-gray-300 text-sm">
-                <i className="fas fa-envelope mr-3 text-yellow-400"></i>
-                <span>{settings?.contactEmail || "info@qbids.kg"}</span>
+                <i className="fas fa-envelope mr-3 text-blue-400"></i>
+                <span>{settings?.contactEmail || "info@qbids.ge"}</span>
               </div>
               <div className="flex items-center text-gray-300 text-sm">
-                <i className="fas fa-clock mr-3 text-yellow-400"></i>
+                <i className="fas fa-clock mr-3 text-blue-400"></i>
                 <span>{t("support24x7")}</span>
               </div>
             </div>
@@ -141,7 +141,7 @@ export function Footer() {
         <div className="border-t border-gray-700 mt-8 pt-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg p-4">
-              <div className="text-2xl font-bold text-yellow-400">1,247</div>
+              <div className="text-2xl font-bold text-blue-400">1,247</div>
               <div className="text-xs text-gray-400 mt-1">{t("activeUsers")}</div>
             </div>
             <div className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg p-4">
@@ -153,7 +153,7 @@ export function Footer() {
               <div className="text-xs text-gray-400 mt-1">{t("completedAuctions")}</div>
             </div>
             <div className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg p-4">
-              <div className="text-2xl font-bold text-orange-400">97%</div>
+              <div className="text-2xl font-bold text-blue-400">97%</div>
               <div className="text-xs text-gray-400 mt-1">{t("satisfiedCustomers")}</div>
             </div>
           </div>
@@ -171,7 +171,7 @@ export function Footer() {
                 <i className="fas fa-award mr-2"></i>
                 <span>{t("licensedPlatform")}</span>
               </div>
-              <div className="flex items-center text-yellow-400 text-sm">
+              <div className="flex items-center text-blue-400 text-sm">
                 <i className="fas fa-handshake mr-2"></i>
                 <span>{t("fairAuctions")}</span>
               </div>
@@ -204,7 +204,7 @@ export function Footer() {
               {settings?.language === "ka" && " ყველა უფლება დაცულია."}
               {!settings?.language && " Все права защищены."}
             </p>
-            <p className="text-yellow-400 text-sm">
+            <p className="text-blue-400 text-sm">
               {settings?.language === "ru" && "Первая пенни-аукционная платформа в России"}
               {settings?.language === "en" && "First penny auction platform in Russia"}
               {settings?.language === "ka" && "პირველი პენი აუქციონის პლატფორმა საქართველოში"}
