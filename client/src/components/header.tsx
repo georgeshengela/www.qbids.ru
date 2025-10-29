@@ -56,24 +56,24 @@ export function Header() {
 
   return (
     <>
-      <header className="bg-white text-black shadow-sm border-b border-slate-200 sticky top-0 z-40">
+      <header className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white shadow-lg border-b border-gray-700 sticky top-0 z-40">
         <div className="max-w-[1504px] mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo and Title */}
             <Link href="/" className="flex items-center space-x-3 hover:opacity-90 transition-opacity">
-              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-sm">
+              <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center shadow-sm">
                 <i className="fas fa-gavel text-white text-lg"></i>
               </div>
               <div className="hidden sm:block">
-                <h1 className="text-2xl font-bold text-slate-900">
-                  {settings?.siteName || "QBIDS.KG"}
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                  {settings?.siteName || "QBIDS.GE"}
                 </h1>
-                <p className="text-xs text-slate-600">
-                  {settings?.headerTagline || "Пенни-аукционы в Кыргызстане"}
+                <p className="text-xs text-gray-300">
+                  {settings?.headerTagline || "პენი-აუქციონები საქართველოში"}
                 </p>
               </div>
               <div className="sm:hidden">
-                <h1 className="text-xl font-bold text-slate-900">{settings?.siteName || "QBIDS.KG"}</h1>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">{settings?.siteName || "QBIDS.GE"}</h1>
               </div>
             </Link>
 
@@ -85,9 +85,10 @@ export function Header() {
                   href={item.href} 
                   className={`px-4 py-2 rounded-lg transition-all duration-200 font-medium text-sm ${
                     location === item.href 
-                      ? "bg-blue-50 text-blue-600 shadow-sm" 
-                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                      ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-md" 
+                      : "text-gray-300 hover:bg-gray-700 hover:text-white"
                   }`}
+                  data-testid={`link-${item.label.toLowerCase()}`}
                 >
                   <i className={`${item.icon} mr-2 text-xs`}></i>
                   {item.label}
@@ -101,16 +102,17 @@ export function Header() {
                 <>
                   {/* Balance and Top Up */}
                   <div className="flex items-center space-x-3">
-                    <div className="bg-green-50 border border-green-200 px-4 py-2 rounded-xl">
+                    <div className="bg-gradient-to-r from-green-600 to-green-700 px-4 py-2 rounded-xl shadow-md">
                       <div className="flex items-center space-x-2 text-sm">
-                        <i className="fas fa-coins text-green-600"></i>
-                        <span className="font-semibold text-green-700">{user.bidBalance} {t("bids")}</span>
+                        <i className="fas fa-coins text-yellow-300"></i>
+                        <span className="font-semibold text-white" data-testid="text-bid-balance">{user.bidBalance} {t("bids")}</span>
                       </div>
                     </div>
                     <Link href="/topup">
                       <Button 
                         size="sm"
-                        className="bg-blue-600 hover:bg-blue-700 text-white h-9 px-4 rounded-lg font-medium"
+                        className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white h-9 px-4 rounded-lg font-medium shadow-md hover:shadow-lg transition-all"
+                        data-testid="button-topup"
                       >
                         <i className="fas fa-plus mr-2 text-xs"></i>
                         {t("topUpBalance")}
@@ -121,35 +123,36 @@ export function Header() {
                   {/* Username with Dropdown */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-slate-300 rounded-xl h-11 px-4">
+                      <Button variant="ghost" className="bg-gray-700 hover:bg-gray-600 border border-gray-600 hover:border-yellow-400 rounded-xl h-11 px-4 transition-all" data-testid="button-user-menu">
                         <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                          <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center">
                             <i className="fas fa-user text-white text-xs"></i>
                           </div>
-                          <span className="font-semibold text-slate-900">{user.username}</span>
-                          <i className="fas fa-chevron-down text-slate-400 text-xs"></i>
+                          <span className="font-semibold text-white" data-testid="text-username">{user.username}</span>
+                          <i className="fas fa-chevron-down text-gray-400 text-xs"></i>
                         </div>
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuContent align="end" className="w-48 bg-gray-800 border-gray-700">
                       <DropdownMenuItem asChild>
-                        <Link href="/profile" className="flex items-center cursor-pointer">
-                          <i className="fas fa-user mr-2 text-slate-500"></i>
+                        <Link href="/profile" className="flex items-center cursor-pointer text-gray-300 hover:text-white hover:bg-gray-700" data-testid="link-profile">
+                          <i className="fas fa-user mr-2 text-yellow-400"></i>
                           {t("profile")}
                         </Link>
                       </DropdownMenuItem>
                       {user?.role === 'admin' && (
                         <DropdownMenuItem asChild>
-                          <Link href="/admin" className="flex items-center cursor-pointer">
-                            <i className="fas fa-cog mr-2 text-slate-500"></i>
+                          <Link href="/admin" className="flex items-center cursor-pointer text-gray-300 hover:text-white hover:bg-gray-700" data-testid="link-admin">
+                            <i className="fas fa-cog mr-2 text-yellow-400"></i>
                             {t("adminPanel")}
                           </Link>
                         </DropdownMenuItem>
                       )}
-                      <DropdownMenuSeparator />
+                      <DropdownMenuSeparator className="bg-gray-700" />
                       <DropdownMenuItem 
                         onClick={handleLogout}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50 cursor-pointer"
+                        className="text-red-400 hover:text-red-300 hover:bg-gray-700 cursor-pointer"
+                        data-testid="button-logout"
                       >
                         <i className="fas fa-sign-out-alt mr-2"></i>
                         {t("logout")}
@@ -160,7 +163,8 @@ export function Header() {
               ) : (
                 <Button 
                   onClick={() => setShowAuthModal(true)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md rounded-lg h-10 px-6 font-medium transition-all duration-200"
+                  className="bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white shadow-md hover:shadow-lg rounded-lg h-10 px-6 font-medium transition-all duration-200"
+                  data-testid="button-login"
                 >
                   <i className="fas fa-sign-in-alt mr-2 text-sm"></i>
                   {t("login")}
@@ -171,25 +175,25 @@ export function Header() {
             {/* Mobile Menu Button */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="lg:hidden">
+                <Button variant="ghost" size="sm" className="lg:hidden text-white hover:bg-gray-700" data-testid="button-mobile-menu">
                   <i className="fas fa-bars text-xl"></i>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-80 p-0">
+              <SheetContent side="right" className="w-80 p-0 bg-gray-800 border-gray-700">
                 <div className="flex flex-col h-full">
                   {/* Header */}
-                  <SheetHeader className="p-6 bg-slate-50 border-b border-slate-200">
+                  <SheetHeader className="p-6 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-b border-gray-700">
                     <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-sm">
+                      <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center shadow-sm">
                         <i className="fas fa-gavel text-white text-xl"></i>
                       </div>
                       <div>
-                        <SheetTitle className="text-slate-900 text-xl font-bold">{settings?.siteName || "QBIDS.KG"}</SheetTitle>
-                        <p className="text-slate-600 text-sm">
-                          {settings?.language === "ru" && "Пенни-аукционы"}
+                        <SheetTitle className="text-white text-xl font-bold">{settings?.siteName || "QBIDS.GE"}</SheetTitle>
+                        <p className="text-gray-300 text-sm">
+                          {settings?.language === "ru" && "Пენი-აუქციონები"}
                           {settings?.language === "en" && "Penny Auctions"}
                           {settings?.language === "ka" && "პენი აუქციონები"}
-                          {!settings?.language && "Пенни-аукционы"}
+                          {!settings?.language && "პენი აუქციონები"}
                         </p>
                       </div>
                     </div>
@@ -201,59 +205,59 @@ export function Header() {
                       <div className="space-y-4">
                         {/* User Info */}
                         <Link href="/profile" onClick={handleNavClick}>
-                          <div className="flex items-center space-x-4 p-4 bg-slate-50 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-100 transition-all duration-200 cursor-pointer">
-                            <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm">
+                          <div className="flex items-center space-x-4 p-4 bg-gray-700 rounded-xl border border-gray-600 hover:border-yellow-400 hover:bg-gray-600 transition-all duration-200 cursor-pointer">
+                            <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-lg flex items-center justify-center shadow-sm">
                               <i className="fas fa-user text-white text-lg"></i>
                             </div>
                             <div className="flex-1">
-                              <p className="font-semibold text-slate-900">{user.username}</p>
-                              <div className="flex items-center space-x-2 text-sm text-slate-600">
-                                <i className="fas fa-coins text-blue-500"></i>
+                              <p className="font-semibold text-white">{user.username}</p>
+                              <div className="flex items-center space-x-2 text-sm text-gray-300">
+                                <i className="fas fa-coins text-yellow-400"></i>
                                 <span>{user.bidBalance} {t("bids")}</span>
                               </div>
                             </div>
-                            <i className="fas fa-chevron-right text-slate-400"></i>
+                            <i className="fas fa-chevron-right text-gray-400"></i>
                           </div>
                         </Link>
 
                         {/* Quick Stats */}
                         <div className="grid grid-cols-2 gap-3">
-                          <div className="p-3 bg-green-50 border border-green-100 rounded-lg text-center">
-                            <i className="fas fa-trophy text-green-600 text-lg mb-1"></i>
-                            <p className="text-xs text-slate-600">{t("wonAuctions")}</p>
-                            <p className="font-semibold text-green-600">0</p>
+                          <div className="p-3 bg-green-900 bg-opacity-30 border border-green-700 rounded-lg text-center">
+                            <i className="fas fa-trophy text-green-400 text-lg mb-1"></i>
+                            <p className="text-xs text-gray-400">{t("wonAuctions")}</p>
+                            <p className="font-semibold text-green-400">0</p>
                           </div>
-                          <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg text-center">
-                            <i className="fas fa-gavel text-blue-600 text-lg mb-1"></i>
-                            <p className="text-xs text-slate-600">{t("bids")}</p>
-                            <p className="font-semibold text-blue-600">-</p>
+                          <div className="p-3 bg-blue-900 bg-opacity-30 border border-blue-700 rounded-lg text-center">
+                            <i className="fas fa-gavel text-blue-400 text-lg mb-1"></i>
+                            <p className="text-xs text-gray-400">{t("bids")}</p>
+                            <p className="font-semibold text-blue-400">-</p>
                           </div>
                         </div>
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        <div className="text-center p-6 bg-slate-50 rounded-xl border border-slate-200">
-                          <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+                        <div className="text-center p-6 bg-gray-700 rounded-xl border border-gray-600">
+                          <div className="w-16 h-16 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
                             <i className="fas fa-user text-white text-2xl"></i>
                           </div>
-                          <h3 className="font-semibold text-slate-900 mb-2">
+                          <h3 className="font-semibold text-white mb-2">
                             {settings?.language === "ru" && "Добро пожаловать!"}
                             {settings?.language === "en" && "Welcome!"}
                             {settings?.language === "ka" && "კეთილი იყოს თქვენი მობრძანება!"}
-                            {!settings?.language && "Добро пожаловать!"}
+                            {!settings?.language && "კეთილი იყოს თქვენი მობრძანება!"}
                           </h3>
-                          <p className="text-sm text-slate-600 mb-4">
+                          <p className="text-sm text-gray-300 mb-4">
                             {settings?.language === "ru" && "Войдите, чтобы начать участвовать в аукционах"}
                             {settings?.language === "en" && "Login to start participating in auctions"}
                             {settings?.language === "ka" && "შედით აუქციონებში მონაწილეობისთვის"}
-                            {!settings?.language && "Войдите, чтобы начать участвовать в аукционах"}
+                            {!settings?.language && "შედით აუქციონებში მონაწილეობისთვის"}
                           </p>
                           <Button 
                             onClick={() => {
                               setShowAuthModal(true);
                               setIsMobileMenuOpen(false);
                             }}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md transition-all duration-200"
+                            className="w-full bg-gradient-to-r from-yellow-400 to-orange-500 hover:from-yellow-500 hover:to-orange-600 text-white shadow-md hover:shadow-lg transition-all duration-200"
                           >
                             <i className="fas fa-sign-in-alt mr-2"></i>
                             {t("login")} / {t("register")}
@@ -263,7 +267,7 @@ export function Header() {
                     )}
                   </div>
 
-                  <Separator />
+                  <Separator className="bg-gray-700" />
 
                   {/* Navigation */}
                   <div className="flex-1 p-6">
@@ -272,13 +276,13 @@ export function Header() {
                         <Link key={item.href} href={item.href} onClick={handleNavClick}>
                           <div className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${
                             location === item.href 
-                              ? "bg-blue-50 text-blue-600 border border-blue-100 shadow-sm" 
-                              : "hover:bg-slate-50 text-slate-700"
+                              ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-md" 
+                              : "hover:bg-gray-700 text-gray-300"
                           }`}>
                             <i className={`${item.icon} w-5 text-sm`}></i>
                             <span className="font-medium">{item.label}</span>
                             {location === item.href && (
-                              <i className="fas fa-chevron-right ml-auto text-blue-600"></i>
+                              <i className="fas fa-chevron-right ml-auto text-white"></i>
                             )}
                           </div>
                         </Link>
@@ -288,13 +292,13 @@ export function Header() {
                     {/* Top Up Link for authenticated users */}
                     {isAuthenticated && (
                       <>
-                        <Separator className="my-4" />
+                        <Separator className="my-4 bg-gray-700" />
                         <div className="space-y-2">
                           <Link href="/topup" onClick={handleNavClick}>
-                            <div className="flex items-center space-x-3 p-3 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 hover:border-green-300 transition-all duration-200">
+                            <div className="flex items-center space-x-3 p-3 rounded-lg bg-green-900 bg-opacity-30 hover:bg-opacity-50 text-green-300 border border-green-700 hover:border-green-500 transition-all duration-200">
                               <i className="fas fa-plus w-5 text-sm"></i>
                               <span className="font-medium">{t("topUpBalance")}</span>
-                              <i className="fas fa-chevron-right ml-auto text-green-600"></i>
+                              <i className="fas fa-chevron-right ml-auto text-green-500"></i>
                             </div>
                           </Link>
                         </div>
@@ -303,11 +307,11 @@ export function Header() {
 
                     {isAuthenticated && user?.role === 'admin' && (
                       <>
-                        <Separator className="my-4" />
+                        <Separator className="my-4 bg-gray-700" />
                         <div className="space-y-2">
-                          <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide px-3">{t("admin")}</h4>
+                          <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide px-3">{t("admin")}</h4>
                           <Link href="/admin" onClick={handleNavClick}>
-                            <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-slate-50 text-slate-700 transition-all duration-200">
+                            <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-700 text-gray-300 transition-all duration-200">
                               <i className="fas fa-cog w-5 text-sm"></i>
                               <span className="font-medium">{t("controlPanel")}</span>
                             </div>
@@ -319,14 +323,14 @@ export function Header() {
 
                   {/* Footer Actions */}
                   {isAuthenticated && (
-                    <div className="p-6 border-t border-slate-200 bg-slate-50">
+                    <div className="p-6 border-t border-gray-700 bg-gray-900">
                       <Button 
                         variant="outline" 
                         onClick={handleLogout}
-                        className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 rounded-lg h-11"
+                        className="w-full border-red-600 text-red-400 hover:bg-red-900 hover:bg-opacity-30 hover:border-red-500 rounded-lg h-11"
                       >
                         <i className="fas fa-sign-out-alt mr-2"></i>
-{t("logoutFromAccount")}
+                        {t("logoutFromAccount")}
                       </Button>
                     </div>
                   )}
