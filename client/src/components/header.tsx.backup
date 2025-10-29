@@ -56,24 +56,24 @@ export function Header() {
 
   return (
     <>
-      <header className="bg-card/95 backdrop-blur-lg text-foreground shadow-lg border-b border-border/50 sticky top-0 z-40">
+      <header className="bg-white text-black shadow-sm border-b border-slate-200 sticky top-0 z-40">
         <div className="max-w-[1504px] mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo and Title */}
             <Link href="/" className="flex items-center space-x-3 hover:opacity-90 transition-opacity">
-              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-sm">
+              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-sm">
                 <i className="fas fa-gavel text-white text-lg"></i>
               </div>
               <div className="hidden sm:block">
-                <h1 className="text-2xl font-bold text-foreground">
+                <h1 className="text-2xl font-bold text-slate-900">
                   {settings?.siteName || "QBIDS.KG"}
                 </h1>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-slate-600">
                   {settings?.headerTagline || "Пенни-аукционы в Кыргызстане"}
                 </p>
               </div>
               <div className="sm:hidden">
-                <h1 className="text-xl font-bold text-foreground">{settings?.siteName || "QBIDS.KG"}</h1>
+                <h1 className="text-xl font-bold text-slate-900">{settings?.siteName || "QBIDS.KG"}</h1>
               </div>
             </Link>
 
@@ -86,7 +86,7 @@ export function Header() {
                   className={`px-4 py-2 rounded-lg transition-all duration-200 font-medium text-sm ${
                     location === item.href 
                       ? "bg-blue-50 text-blue-600 shadow-sm" 
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                   }`}
                 >
                   <i className={`${item.icon} mr-2 text-xs`}></i>
@@ -110,7 +110,7 @@ export function Header() {
                     <Link href="/topup">
                       <Button 
                         size="sm"
-                        className="bg-primary hover:bg-blue-700 text-white h-9 px-4 rounded-lg font-medium"
+                        className="bg-blue-600 hover:bg-blue-700 text-white h-9 px-4 rounded-lg font-medium"
                       >
                         <i className="fas fa-plus mr-2 text-xs"></i>
                         {t("topUpBalance")}
@@ -121,12 +121,12 @@ export function Header() {
                   {/* Username with Dropdown */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="bg-muted hover:bg-muted/80 border border-border hover:border-border/70 rounded-xl h-11 px-4">
+                      <Button variant="ghost" className="bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-slate-300 rounded-xl h-11 px-4">
                         <div className="flex items-center space-x-3">
-                          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                             <i className="fas fa-user text-white text-xs"></i>
                           </div>
-                          <span className="font-semibold text-foreground">{user.username}</span>
+                          <span className="font-semibold text-slate-900">{user.username}</span>
                           <i className="fas fa-chevron-down text-slate-400 text-xs"></i>
                         </div>
                       </Button>
@@ -160,7 +160,7 @@ export function Header() {
               ) : (
                 <Button 
                   onClick={() => setShowAuthModal(true)}
-                  className="bg-primary hover:bg-blue-700 text-white shadow-sm hover:shadow-md rounded-lg h-10 px-6 font-medium transition-all duration-200"
+                  className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md rounded-lg h-10 px-6 font-medium transition-all duration-200"
                 >
                   <i className="fas fa-sign-in-alt mr-2 text-sm"></i>
                   {t("login")}
@@ -178,14 +178,14 @@ export function Header() {
               <SheetContent side="right" className="w-80 p-0">
                 <div className="flex flex-col h-full">
                   {/* Header */}
-                  <SheetHeader className="p-6 bg-muted border-b border-border">
+                  <SheetHeader className="p-6 bg-slate-50 border-b border-slate-200">
                     <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-sm">
+                      <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-sm">
                         <i className="fas fa-gavel text-white text-xl"></i>
                       </div>
                       <div>
-                        <SheetTitle className="text-foreground text-xl font-bold">{settings?.siteName || "QBIDS.KG"}</SheetTitle>
-                        <p className="text-muted-foreground text-sm">
+                        <SheetTitle className="text-slate-900 text-xl font-bold">{settings?.siteName || "QBIDS.KG"}</SheetTitle>
+                        <p className="text-slate-600 text-sm">
                           {settings?.language === "ru" && "Пенни-аукционы"}
                           {settings?.language === "en" && "Penny Auctions"}
                           {settings?.language === "ka" && "პენი აუქციონები"}
@@ -201,13 +201,13 @@ export function Header() {
                       <div className="space-y-4">
                         {/* User Info */}
                         <Link href="/profile" onClick={handleNavClick}>
-                          <div className="flex items-center space-x-4 p-4 bg-muted rounded-xl border border-border hover:border-border/70 hover:bg-muted/80 transition-all duration-200 cursor-pointer">
-                            <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center shadow-sm">
+                          <div className="flex items-center space-x-4 p-4 bg-slate-50 rounded-xl border border-slate-200 hover:border-slate-300 hover:bg-slate-100 transition-all duration-200 cursor-pointer">
+                            <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm">
                               <i className="fas fa-user text-white text-lg"></i>
                             </div>
                             <div className="flex-1">
-                              <p className="font-semibold text-foreground">{user.username}</p>
-                              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                              <p className="font-semibold text-slate-900">{user.username}</p>
+                              <div className="flex items-center space-x-2 text-sm text-slate-600">
                                 <i className="fas fa-coins text-blue-500"></i>
                                 <span>{user.bidBalance} {t("bids")}</span>
                               </div>
@@ -220,29 +220,29 @@ export function Header() {
                         <div className="grid grid-cols-2 gap-3">
                           <div className="p-3 bg-green-50 border border-green-100 rounded-lg text-center">
                             <i className="fas fa-trophy text-green-600 text-lg mb-1"></i>
-                            <p className="text-xs text-muted-foreground">{t("wonAuctions")}</p>
+                            <p className="text-xs text-slate-600">{t("wonAuctions")}</p>
                             <p className="font-semibold text-green-600">0</p>
                           </div>
                           <div className="p-3 bg-blue-50 border border-blue-100 rounded-lg text-center">
                             <i className="fas fa-gavel text-blue-600 text-lg mb-1"></i>
-                            <p className="text-xs text-muted-foreground">{t("bids")}</p>
+                            <p className="text-xs text-slate-600">{t("bids")}</p>
                             <p className="font-semibold text-blue-600">-</p>
                           </div>
                         </div>
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        <div className="text-center p-6 bg-muted rounded-xl border border-border">
-                          <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
+                        <div className="text-center p-6 bg-slate-50 rounded-xl border border-slate-200">
+                          <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm">
                             <i className="fas fa-user text-white text-2xl"></i>
                           </div>
-                          <h3 className="font-semibold text-foreground mb-2">
+                          <h3 className="font-semibold text-slate-900 mb-2">
                             {settings?.language === "ru" && "Добро пожаловать!"}
                             {settings?.language === "en" && "Welcome!"}
                             {settings?.language === "ka" && "კეთილი იყოს თქვენი მობრძანება!"}
                             {!settings?.language && "Добро пожаловать!"}
                           </h3>
-                          <p className="text-sm text-muted-foreground mb-4">
+                          <p className="text-sm text-slate-600 mb-4">
                             {settings?.language === "ru" && "Войдите, чтобы начать участвовать в аукционах"}
                             {settings?.language === "en" && "Login to start participating in auctions"}
                             {settings?.language === "ka" && "შედით აუქციონებში მონაწილეობისთვის"}
@@ -253,7 +253,7 @@ export function Header() {
                               setShowAuthModal(true);
                               setIsMobileMenuOpen(false);
                             }}
-                            className="w-full bg-primary hover:bg-blue-700 text-white shadow-sm hover:shadow-md transition-all duration-200"
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-sm hover:shadow-md transition-all duration-200"
                           >
                             <i className="fas fa-sign-in-alt mr-2"></i>
                             {t("login")} / {t("register")}
@@ -273,7 +273,7 @@ export function Header() {
                           <div className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${
                             location === item.href 
                               ? "bg-blue-50 text-blue-600 border border-blue-100 shadow-sm" 
-                              : "hover:bg-muted text-foreground/90"
+                              : "hover:bg-slate-50 text-slate-700"
                           }`}>
                             <i className={`${item.icon} w-5 text-sm`}></i>
                             <span className="font-medium">{item.label}</span>
@@ -307,7 +307,7 @@ export function Header() {
                         <div className="space-y-2">
                           <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide px-3">{t("admin")}</h4>
                           <Link href="/admin" onClick={handleNavClick}>
-                            <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-muted text-foreground/90 transition-all duration-200">
+                            <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-slate-50 text-slate-700 transition-all duration-200">
                               <i className="fas fa-cog w-5 text-sm"></i>
                               <span className="font-medium">{t("controlPanel")}</span>
                             </div>
@@ -319,7 +319,7 @@ export function Header() {
 
                   {/* Footer Actions */}
                   {isAuthenticated && (
-                    <div className="p-6 border-t border-border bg-muted">
+                    <div className="p-6 border-t border-slate-200 bg-slate-50">
                       <Button 
                         variant="outline" 
                         onClick={handleLogout}
