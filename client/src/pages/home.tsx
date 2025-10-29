@@ -18,87 +18,183 @@ import type { Auction, Bid } from "@/types/auction";
 // Hero Section Component
 function HeroSection({ isAuthenticated }: { isAuthenticated: boolean }) {
   const { t } = useLanguage();
+  const { settings } = useSettings();
   
   return (
-    <section className="relative bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 overflow-hidden">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-1/2 -left-40 w-80 h-80 bg-purple-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-      </div>
+    <section className="py-8">
+      <div className="max-w-[1504px] mx-auto px-4">
+        <div className="relative h-[450px] bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-3xl overflow-hidden shadow-2xl">
+          {/* Animated background elements */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute -top-20 -right-20 w-72 h-72 bg-yellow-400/20 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute top-1/2 -left-20 w-64 h-64 bg-purple-400/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+            <div className="absolute bottom-0 right-1/4 w-56 h-56 bg-blue-400/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+          </div>
 
-      <div className="relative z-10 max-w-[1504px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          {/* Left Side - Main Content */}
-          <div className="space-y-6">
-            <h1 className="text-4xl sm:text-5xl font-black text-white leading-tight">
-              Выигрывайте премиум товары
-              <span className="text-yellow-300"> за копейки!</span>
-            </h1>
-            <p className="text-lg text-blue-100">
-              Пенни-аукционы №1 в России. Экономьте до 99% на iPhone, MacBook и других гаджетах
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              {!isAuthenticated ? (
-                <>
-                  <Link href="/login">
-                    <Button className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold px-6 py-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 border-0">
-                      <i className="fas fa-rocket mr-2"></i>
-                      Начать выигрывать
-                    </Button>
-                  </Link>
-                  <Link href="/how-it-works">
-                    <Button className="bg-white/10 hover:bg-white/20 backdrop-blur-lg text-white font-semibold px-6 py-3 rounded-lg border border-white/30 transition-all duration-300">
-                      Как это работает?
-                    </Button>
-                  </Link>
-                </>
-              ) : (
-                <Link href="/auctions">
-                  <Button className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold px-6 py-3 rounded-lg shadow-lg hover:scale-105 transition-all duration-300 border-0">
-                    <i className="fas fa-eye mr-2"></i>
-                    Посмотреть аукционы
-                  </Button>
-                </Link>
-              )}
+          {/* Decorative pattern overlay */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }}></div>
+          </div>
+
+          <div className="relative z-10 h-full flex items-center px-8 md:px-12 lg:px-16">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full items-center">
+              {/* Left Side - Main Content */}
+              <div className="space-y-6">
+                {/* Badge */}
+                <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30">
+                  <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                  <span className="text-white text-sm font-semibold">
+                    {settings?.language === "ka" ? "პირველი პენი აუქციონი საქართველოში" : 
+                     settings?.language === "en" ? "First Penny Auction in Georgia" :
+                     "Первый пенни аукцион в Грузии"}
+                  </span>
+                </div>
+
+                {/* Main Heading */}
+                <h1 className="text-4xl lg:text-5xl font-black text-white leading-tight">
+                  {settings?.language === "ka" ? (
+                    <>
+                      მოიგეთ პრემიუმ <br />
+                      <span className="text-yellow-300">ტექნიკა 99%-მდე</span> <br />
+                      ფასდაკლებით!
+                    </>
+                  ) : settings?.language === "en" ? (
+                    <>
+                      Win Premium <br />
+                      <span className="text-yellow-300">Tech Up to 99%</span> <br />
+                      Off!
+                    </>
+                  ) : (
+                    <>
+                      Выигрывайте <br />
+                      <span className="text-yellow-300">технику со скидкой</span> <br />
+                      до 99%!
+                    </>
+                  )}
+                </h1>
+
+                <p className="text-lg text-blue-100 max-w-lg">
+                  {settings?.language === "ka" ? 
+                    "iPhone, MacBook, Samsung და სხვა ბრენდული ტექნიკა უნიკალური პენი-აუქციონის ფორმატით" :
+                   settings?.language === "en" ?
+                    "iPhone, MacBook, Samsung and other premium tech through unique penny auction format" :
+                    "iPhone, MacBook, Samsung и другая брендовая техника в уникальном формате пенни-аукционов"}
+                </p>
+                
+                {/* CTA Buttons */}
+                <div className="flex flex-wrap gap-3 pt-2">
+                  {!isAuthenticated ? (
+                    <>
+                      <Link href="/login">
+                        <Button 
+                          className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-0"
+                          data-testid="button-hero-start"
+                        >
+                          <i className="fas fa-rocket mr-2"></i>
+                          {settings?.language === "ka" ? "დაიწყე მოგება" : 
+                           settings?.language === "en" ? "Start Winning" :
+                           "Начать выигрывать"}
+                        </Button>
+                      </Link>
+                      <Link href="/how-it-works">
+                        <Button 
+                          className="bg-white/10 hover:bg-white/20 backdrop-blur-lg text-white font-semibold px-8 py-6 text-lg rounded-xl border-2 border-white/30 hover:border-white/50 transition-all duration-300"
+                          data-testid="button-hero-learn"
+                        >
+                          <i className="fas fa-play-circle mr-2"></i>
+                          {settings?.language === "ka" ? "როგორ მუშაობს?" : 
+                           settings?.language === "en" ? "How It Works?" :
+                           "Как это работает?"}
+                        </Button>
+                      </Link>
+                    </>
+                  ) : (
+                    <Link href="/auctions">
+                      <Button 
+                        className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-0"
+                        data-testid="button-hero-auctions"
+                      >
+                        <i className="fas fa-eye mr-2"></i>
+                        {settings?.language === "ka" ? "ნახე აუქციონები" : 
+                         settings?.language === "en" ? "View Auctions" :
+                         "Посмотреть аукционы"}
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+              </div>
+
+              {/* Right Side - Stats & Features */}
+              <div className="grid grid-cols-2 gap-4">
+                {/* Stat Card 1 */}
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-14 h-14 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center mb-3 shadow-lg">
+                      <i className="fas fa-trophy text-2xl text-white"></i>
+                    </div>
+                    <div className="text-3xl font-black text-white mb-1">99%</div>
+                    <p className="text-blue-100 text-sm font-medium">
+                      {settings?.language === "ka" ? "ფასდაკლება" : 
+                       settings?.language === "en" ? "Discount" :
+                       "Экономия"}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Stat Card 2 */}
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center mb-3 shadow-lg">
+                      <i className="fas fa-shield-check text-2xl text-white"></i>
+                    </div>
+                    <div className="text-3xl font-black text-white mb-1">100%</div>
+                    <p className="text-blue-100 text-sm font-medium">
+                      {settings?.language === "ka" ? "ორიგინალური" : 
+                       settings?.language === "en" ? "Authentic" :
+                       "Оригинал"}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Stat Card 3 */}
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-14 h-14 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-xl flex items-center justify-center mb-3 shadow-lg">
+                      <i className="fas fa-bolt text-2xl text-white"></i>
+                    </div>
+                    <div className="text-3xl font-black text-white mb-1">24/7</div>
+                    <p className="text-blue-100 text-sm font-medium">
+                      {settings?.language === "ka" ? "აუქციონები" : 
+                       settings?.language === "en" ? "Auctions" :
+                       "Аукционы"}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Stat Card 4 */}
+                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-14 h-14 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center mb-3 shadow-lg">
+                      <i className="fas fa-shipping-fast text-2xl text-white"></i>
+                    </div>
+                    <div className="text-3xl font-black text-white mb-1">
+                      {settings?.language === "ka" ? "უფ" : 
+                       settings?.language === "en" ? "Free" :
+                       "Бесп"}
+                    </div>
+                    <p className="text-blue-100 text-sm font-medium">
+                      {settings?.language === "ka" ? "მიწოდება" : 
+                       settings?.language === "en" ? "Delivery" :
+                       "Доставка"}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Right Side - Features */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-              <div className="w-12 h-12 bg-yellow-400 rounded-lg flex items-center justify-center mb-3">
-                <i className="fas fa-gavel text-xl text-blue-900"></i>
-              </div>
-              <h3 className="text-base font-bold text-white mb-1">Честные аукционы</h3>
-              <p className="text-blue-100 text-sm">Прозрачная система торгов</p>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-              <div className="w-12 h-12 bg-green-400 rounded-lg flex items-center justify-center mb-3">
-                <i className="fas fa-bolt text-xl text-blue-900"></i>
-              </div>
-              <h3 className="text-base font-bold text-white mb-1">Мгновенные результаты</h3>
-              <p className="text-blue-100 text-sm">Реал-тайм обновления</p>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-              <div className="w-12 h-12 bg-purple-400 rounded-lg flex items-center justify-center mb-3">
-                <i className="fas fa-shield-alt text-xl text-blue-900"></i>
-              </div>
-              <h3 className="text-base font-bold text-white mb-1">Гарантия качества</h3>
-              <p className="text-blue-100 text-sm">100% оригинальная продукция</p>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
-              <div className="w-12 h-12 bg-blue-400 rounded-lg flex items-center justify-center mb-3">
-                <i className="fas fa-percentage text-xl text-blue-900"></i>
-              </div>
-              <h3 className="text-base font-bold text-white mb-1">Экономия до 99%</h3>
-              <p className="text-blue-100 text-sm">Выигрывайте по минимальной цене</p>
-            </div>
-          </div>
+          {/* Bottom decorative line */}
+          <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent"></div>
         </div>
       </div>
     </section>
