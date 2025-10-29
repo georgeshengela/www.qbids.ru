@@ -21,9 +21,9 @@ function HeroSection({ isAuthenticated }: { isAuthenticated: boolean }) {
   const { settings } = useSettings();
   
   return (
-    <section className="py-8">
+    <section className="py-4 md:py-8">
       <div className="max-w-[1504px] mx-auto px-4">
-        <div className="relative h-[450px] bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-3xl overflow-hidden shadow-2xl">
+        <div className="relative min-h-[500px] md:h-[450px] bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 rounded-2xl md:rounded-3xl overflow-hidden shadow-2xl">
           {/* Animated background elements */}
           <div className="absolute inset-0 overflow-hidden">
             <div className="absolute -top-20 -right-20 w-72 h-72 bg-yellow-400/20 rounded-full blur-3xl animate-pulse"></div>
@@ -36,22 +36,22 @@ function HeroSection({ isAuthenticated }: { isAuthenticated: boolean }) {
             <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }}></div>
           </div>
 
-          <div className="relative z-10 h-full flex items-center px-8 md:px-12 lg:px-16">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full items-center">
+          <div className="relative z-10 h-full flex items-center px-4 py-8 md:px-12 lg:px-16">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 w-full items-center">
               {/* Left Side - Main Content */}
-              <div className="space-y-6">
+              <div className="space-y-4 md:space-y-6">
                 {/* Badge */}
-                <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30">
+                <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-white/30">
                   <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                  <span className="text-white text-sm font-semibold">
+                  <span className="text-white text-xs md:text-sm font-semibold">
                     {settings?.language === "ka" ? "პირველი პენი აუქციონი საქართველოში" : 
                      settings?.language === "en" ? "First Penny Auction in Georgia" :
-                     "Первый пенни аукцион в Грузии"}
+                     "Первый пენი аукцион в Грузии"}
                   </span>
                 </div>
 
                 {/* Main Heading */}
-                <h1 className="text-4xl lg:text-5xl font-black text-white leading-tight">
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight">
                   {settings?.language === "ka" ? (
                     <>
                       მოიგეთ პრემიუმ <br />
@@ -73,7 +73,7 @@ function HeroSection({ isAuthenticated }: { isAuthenticated: boolean }) {
                   )}
                 </h1>
 
-                <p className="text-lg text-blue-100 max-w-lg">
+                <p className="text-sm md:text-base lg:text-lg text-blue-100 max-w-lg">
                   {settings?.language === "ka" ? 
                     "iPhone, MacBook, Samsung და სხვა ბრენდული ტექნიკა უნიკალური პენი-აუქციონის ფორმატით" :
                    settings?.language === "en" ?
@@ -82,12 +82,12 @@ function HeroSection({ isAuthenticated }: { isAuthenticated: boolean }) {
                 </p>
                 
                 {/* CTA Buttons */}
-                <div className="flex flex-wrap gap-3 pt-2">
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
                   {!isAuthenticated ? (
                     <>
                       <Link href="/login">
                         <Button 
-                          className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-0"
+                          className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold px-6 py-4 md:px-8 md:py-6 text-base md:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-0 w-full sm:w-auto"
                           data-testid="button-hero-start"
                         >
                           <i className="fas fa-rocket mr-2"></i>
@@ -98,7 +98,7 @@ function HeroSection({ isAuthenticated }: { isAuthenticated: boolean }) {
                       </Link>
                       <Link href="/how-it-works">
                         <Button 
-                          className="bg-white/10 hover:bg-white/20 backdrop-blur-lg text-white font-semibold px-8 py-6 text-lg rounded-xl border-2 border-white/30 hover:border-white/50 transition-all duration-300"
+                          className="bg-white/10 hover:bg-white/20 backdrop-blur-lg text-white font-semibold px-6 py-4 md:px-8 md:py-6 text-base md:text-lg rounded-xl border-2 border-white/30 hover:border-white/50 transition-all duration-300 w-full sm:w-auto"
                           data-testid="button-hero-learn"
                         >
                           <i className="fas fa-play-circle mr-2"></i>
@@ -111,7 +111,7 @@ function HeroSection({ isAuthenticated }: { isAuthenticated: boolean }) {
                   ) : (
                     <Link href="/auctions">
                       <Button 
-                        className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold px-8 py-6 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-0"
+                        className="bg-yellow-400 hover:bg-yellow-500 text-blue-900 font-bold px-6 py-4 md:px-8 md:py-6 text-base md:text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-0 w-full sm:w-auto"
                         data-testid="button-hero-auctions"
                       >
                         <i className="fas fa-eye mr-2"></i>
@@ -125,15 +125,15 @@ function HeroSection({ isAuthenticated }: { isAuthenticated: boolean }) {
               </div>
 
               {/* Right Side - Stats & Features */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 md:gap-4">
                 {/* Stat Card 1 */}
-                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300">
+                <div className="bg-white/10 backdrop-blur-lg rounded-xl md:rounded-2xl p-4 md:p-6 border border-white/20 hover:bg-white/15 transition-all duration-300">
                   <div className="flex flex-col items-center text-center">
-                    <div className="w-14 h-14 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center mb-3 shadow-lg">
-                      <i className="fas fa-trophy text-2xl text-white"></i>
+                    <div className="w-10 h-10 md:w-14 md:h-14 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg md:rounded-xl flex items-center justify-center mb-2 md:mb-3 shadow-lg">
+                      <i className="fas fa-trophy text-lg md:text-2xl text-white"></i>
                     </div>
-                    <div className="text-3xl font-black text-white mb-1">99%</div>
-                    <p className="text-blue-100 text-sm font-medium">
+                    <div className="text-2xl md:text-3xl font-black text-white mb-1">99%</div>
+                    <p className="text-blue-100 text-xs md:text-sm font-medium">
                       {settings?.language === "ka" ? "ფასდაკლება" : 
                        settings?.language === "en" ? "Discount" :
                        "Экономия"}
