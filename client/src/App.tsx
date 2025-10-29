@@ -32,12 +32,21 @@ import { initGA } from "./lib/analytics";
 import { WelcomeModal } from "@/components/welcome-modal";
 import { CompleteProfileModal } from "@/components/complete-profile-modal";
 import { CookieBanner } from "@/components/cookie-banner";
+import { useSettings } from "@/hooks/use-settings";
 
 function Router() {
   // Track page views when routes change
   useAnalytics();
   const { user } = useAuth();
+  const { settings } = useSettings();
   const [showCompleteProfileModal, setShowCompleteProfileModal] = useState(false);
+
+  // Apply language attribute to body for font styling
+  useEffect(() => {
+    if (settings?.language) {
+      document.body.setAttribute('data-language', settings.language);
+    }
+  }, [settings?.language]);
 
   // Check for complete profile modal flag after login/registration
   useEffect(() => {

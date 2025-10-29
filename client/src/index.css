@@ -1,5 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Huninn&display=swap');
 
+@font-face {
+  font-family: 'MarkGEO';
+  src: url('https://webstatic.bog.ge/fonts/markgeo/MarkGEO-Regular/MarkGEO-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MarkGEOCAPS';
+  src: url('https://webstatic.bog.ge/fonts/markgeo/MarkGEOCAPS-Regular/MarkGEOCAPS-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -62,6 +78,23 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+  }
+
+  /* Georgian fonts */
+  body[data-language="ka"],
+  html[data-language="ka"] body {
+    font-family: 'MarkGEO', sans-serif !important;
+  }
+
+  body[data-language="ka"] h1,
+  body[data-language="ka"] h2,
+  body[data-language="ka"] h3,
+  body[data-language="ka"] h4,
+  body[data-language="ka"] h5,
+  body[data-language="ka"] h6,
+  body[data-language="ka"] .font-bold,
+  body[data-language="ka"] .uppercase {
+    font-family: 'MarkGEOCAPS', sans-serif !important;
   }
 }
 
