@@ -202,7 +202,7 @@ function HeroSection({ isAuthenticated }: { isAuthenticated: boolean }) {
 }
 
 export default function Home() {
-  useDocumentTitle("QBIDS.RU - №1 Пенни-аукционы в России | Выиграй iPhone за копейки");
+  useDocumentTitle("QBIDS.GE - №1 პენი-აუქციონები საქართველოში | მოიგე iPhone ფრთხილებად");
   
   const { connected } = useSocket();
   const { user, isAuthenticated } = useAuth();
@@ -279,10 +279,8 @@ export default function Home() {
       {/* Hero Section */}
       <HeroSection isAuthenticated={isAuthenticated} />
 
-      
-      <main className="max-w-[1504px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          <div className="lg:col-span-3">
+      {/* Main auction sections - full width */}
+      <div className="max-w-[1504px] mx-auto px-4 pt-8 pb-4">
             {/* Bid Package Auctions Section */}
             {(() => {
               const bidPackageAuctions = auctionsData?.upcoming?.filter(auction => auction.isBidPackage) || [];
@@ -490,7 +488,7 @@ export default function Home() {
             </div>
 
             {/* Today's Winners Section */}
-            <div className="mb-4">
+            <div className="mb-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
                 <i className="fas fa-trophy text-yellow-500 mr-2"></i>
                 {t("winnersOfTheDay")}
@@ -536,13 +534,12 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </div>
+      </div>
 
-          <div className="lg:col-span-1">
-            <Sidebar />
-          </div>
-        </div>
-      </main>
+      {/* Sidebar - separate section */}
+      <aside className="max-w-[1504px] mx-auto px-4 pb-8">
+        <Sidebar />
+      </aside>
     </div>
   );
 }

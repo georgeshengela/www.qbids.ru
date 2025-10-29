@@ -15,7 +15,7 @@ export default function Auctions() {
   const { t } = useLanguage();
   const { connected } = useSocket();
 
-  useDocumentTitle(`${t("upcomingAuctions")} - QBIDS.KG | Скоро начнутся новые торги`);
+  useDocumentTitle(`${t("upcomingAuctions")} - QBIDS.GE | მალე დაიწყება ახალი აუქციონები`);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentTime, setCurrentTime] = useState(Date.now());
   const auctionsPerPage = 12;

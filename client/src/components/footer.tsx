@@ -142,21 +142,11 @@ export function Footer() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg p-4">
               <div className="text-2xl font-bold text-yellow-400">1,247</div>
-              <div className="text-xs text-gray-400 mt-1">
-                {settings?.language === "ru" && "Активных пользователей"}
-                {settings?.language === "en" && "Active Users"}
-                {settings?.language === "ka" && "აქტიური მომხმარებლები"}
-                {!settings?.language && "Активных пользователей"}
-              </div>
+              <div className="text-xs text-gray-400 mt-1">{t("activeUsers")}</div>
             </div>
             <div className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg p-4">
               <div className="text-2xl font-bold text-green-400">2.8M</div>
-              <div className="text-xs text-gray-400 mt-1">
-                {settings?.language === "ru" && "Сохранено покупателями"}
-                {settings?.language === "en" && "Saved by Buyers"}
-                {settings?.language === "ka" && "შეზოგილი მყიდველების მიერ"}
-                {!settings?.language && "Сохранено покупателями"}
-              </div>
+              <div className="text-xs text-gray-400 mt-1">{t("savedByBuyers")}</div>
             </div>
             <div className="bg-gradient-to-r from-gray-800 to-gray-700 rounded-lg p-4">
               <div className="text-2xl font-bold text-blue-400">356</div>

@@ -9,17 +9,17 @@ export function useSettings() {
 
   const formatCurrency = (amount: string | number) => {
     const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-    const currency = settings?.currencySymbol || "сом";
-    return `${numAmount.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`;
+    const currency = settings?.currencySymbol || "₾";
+    return `${numAmount.toLocaleString('ka-GE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`;
   };
 
   const defaultSettings = { 
-    currency: "сом", 
-    currencySymbol: "сом", 
-    siteName: "QBIDS.KG", 
-    language: "ru",
-    headerTagline: "Пенни-аукционы в Кыргызстане",
-    footerDescription: "Первая пенни-аукционная платформа в Кыргызстане. Выигрывайте премиальные товары за копейки с нашей честной и прозрачной системой аукционов."
+    currency: "₾", 
+    currencySymbol: "₾", 
+    siteName: "QBIDS.GE", 
+    language: "ka",
+    headerTagline: "პენი-აუქციონები საქართველოში",
+    footerDescription: "პირველი პენი-აუქციონის პლატფორმა საქართველოში. მოიგეთ პრემიუმ ნივთები ფრთხილებად ჩვენი სამართლიანი და გამჭვირვალე აუქციონის სისტემით."
   };
   const currentSettings = settings || defaultSettings;
 

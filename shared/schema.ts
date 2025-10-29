@@ -91,15 +91,15 @@ export const auctionBots = pgTable("auction_bots", {
 // Settings table for system configuration
 export const settings = pgTable("settings", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  currency: text("currency").notNull().default("сом"),
-  currencySymbol: text("currency_symbol").notNull().default("сом"),
-  siteName: text("site_name").notNull().default("QBIDS.RU"),
-  language: text("language").notNull().default("ru"),
-  headerTagline: text("header_tagline").default("Пенни-аукционы в России"),
-  footerDescription: text("footer_description").default("Первая пенни-аукционная платформа в России. Выигрывайте премиальные товары за копейки с нашей честной и прозрачной системой аукционов."),
-  contactAddress: text("contact_address").default("г. Москва, ул. Тверская 15"),
-  contactPhone: text("contact_phone").default("+7 (495) 123-4567"),
-  contactEmail: text("contact_email").default("info@qbids.ru"),
+  currency: text("currency").notNull().default("₾"),
+  currencySymbol: text("currency_symbol").notNull().default("₾"),
+  siteName: text("site_name").notNull().default("QBIDS.GE"),
+  language: text("language").notNull().default("ka"),
+  headerTagline: text("header_tagline").default("პენი-აუქციონები საქართველოში"),
+  footerDescription: text("footer_description").default("პირველი პენი-აუქციონის პლატფორმა საქართველოში. მოიგეთ პრემიუმ ნივთები ფრთხილებად ჩვენი სამართლიანი და გამჭვირვალე აუქციონის სისტემით."),
+  contactAddress: text("contact_address").default("თბილისი, საქართველო"),
+  contactPhone: text("contact_phone").default("+995 593 09 00 00"),
+  contactEmail: text("contact_email").default("info@qbids.ge"),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 

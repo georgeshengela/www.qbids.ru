@@ -100,6 +100,15 @@ export const translations = {
     privacyPolicy: "Политика конфиденциальности",
     termsOfService: "Условия использования",
     contactUs: "Связаться с нами",
+    activeUsers: "Активных пользователей",
+    savedByBuyers: "Сохранено покупателями",
+    allRightsReserved: "Все права защищены.",
+    firstPennyAuctionPlatform: "Первая пенни-аукционная платформа в Грузии",
+    satisfiedCustomers: "Довольных клиентов",
+    securePayments: "Безопасные платежи",
+    licensedPlatform: "Лицензированная платформа",
+    fairAuctions: "Честные аукционы",
+    support24x7: "Поддержка 24/7",
     
     // Admin
     adminSettings: "Настройки системы",
@@ -574,6 +583,15 @@ export const translations = {
     privacyPolicy: "Privacy Policy",
     termsOfService: "Terms of Service",
     contactUs: "Contact Us",
+    activeUsers: "Active Users",
+    savedByBuyers: "Saved by Buyers",
+    allRightsReserved: "All rights reserved.",
+    firstPennyAuctionPlatform: "First penny auction platform in Georgia",
+    satisfiedCustomers: "Satisfied Customers",
+    securePayments: "Secure Payments",
+    licensedPlatform: "Licensed Platform",
+    fairAuctions: "Fair Auctions",
+    support24x7: "24/7 Support",
     
     // Admin
     adminSettings: "System Settings",
@@ -1041,6 +1059,15 @@ export const translations = {
     privacyPolicy: "კონფიდენციალურობის პოლიტიკა",
     termsOfService: "გამოყენების პირობები",
     contactUs: "დაგვიკავშირდით",
+    activeUsers: "აქტიური მომხმარებლები",
+    savedByBuyers: "შეზოგილი მყიდველების მიერ",
+    allRightsReserved: "ყველა უფლება დაცულია.",
+    firstPennyAuctionPlatform: "პირველი პენი აუქციონის პლატფორმა საქართველოში",
+    satisfiedCustomers: "კმაყოფილი მომხმარებლები",
+    securePayments: "უსაფრთხო გადახდები",
+    licensedPlatform: "ლიცენზირებული პლატფორმა",
+    fairAuctions: "სამართლიანი აუქციონები",
+    support24x7: "24/7 მხარდაჭერა",
     
     // Admin
     adminSettings: "სისტემის პარამეტრები",
