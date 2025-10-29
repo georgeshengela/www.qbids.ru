@@ -217,7 +217,7 @@ export function Footer() {
             <p className="text-yellow-400 text-sm">
               {settings?.language === "ru" && "Первая пенни-аукционная платформа в России"}
               {settings?.language === "en" && "First penny auction platform in Russia"}
-              {settings?.language === "ka" && "პირველი პენი აუქციონის პლატფორმა რუსეთში"}
+              {settings?.language === "ka" && "პირველი პენი აუქციონის პლატფორმა საქართველოში"}
               {!settings?.language && "Первая пенни-аукционная платформа в России"}
             </p>
           </div>
