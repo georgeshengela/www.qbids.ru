@@ -768,9 +768,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       });
     } catch (error: any) {
-      console.error("Registration error:", error);
+      console.error("=".repeat(80));
+      console.error("REGISTRATION ERROR CAUGHT:");
+      console.error("Error object:", error);
+      console.error("Error name:", error.name);
       console.error("Error message:", error.message);
       console.error("Error stack:", error.stack);
+      console.error("Error code:", error.code);
+      console.error("Error detail:", error.detail);
+      console.error("Error constraint:", error.constraint);
+      console.error("=".repeat(80));
       // Clear session data on registration error
       delete (req.session as any).verifiedPhone;
       delete (req.session as any).pendingOTP;
