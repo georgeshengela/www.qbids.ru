@@ -37,7 +37,7 @@ export default function AdminApiDocs() {
     return null;
   }
 
-  const baseUrl = window.location.origin;
+  const baseUrl = "https://qbids.ge";
 
   const EndpointCard = ({ 
     method, 
