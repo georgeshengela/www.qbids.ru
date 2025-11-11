@@ -342,7 +342,7 @@ Content-Type: application/json`}
             method="POST"
             endpoint="/api/auth/verify-otp"
             title="Проверить OTP код"
-            description="Верифицировать 4-значный OTP код используя verificationId от send-otp. Stateless проверка с использованием hashed OTP кодов в базе данных. Работает для веб (сессии) и мобильных приложений (JWT tokens)."
+            description="Верифицировать 4-значный OTP код используя verificationId от send-otp. Stateless проверка с использованием hashed OTP кодов в базе данных. Работает для веб (сессии) и мобильных приложений (JWT tokens). После успешной верификации используйте verificationId для регистрации."
             headers={{
               "Content-Type": "application/json",
               "Accept-Language": "ka | ru | en"
@@ -356,6 +356,38 @@ Content-Type: application/json`}
               success: true,
               message: "Phone number verified successfully",
               verifiedPhone: "+995593090000"
+            }}
+          />
+
+          <EndpointCard
+            method="POST"
+            endpoint="/api/auth/register"
+            title="Регистрация пользователя"
+            description="Создать новый аккаунт. Для мобильных приложений: отправьте verificationId от verify-otp для подтверждения телефона. Для веб: телефон проверяется через сессию. Возвращает JWT токены для stateless аутентификации."
+            headers={{
+              "Content-Type": "application/json",
+              "Accept-Language": "ka | ru | en"
+            }}
+            requestBody={{
+              username: "user123",
+              email: "user@example.com",
+              phone: "+995593090000",
+              password: "securePassword123",
+              verificationId: "550e8400-e29b-41d4-a716-446655440000"
+            }}
+            responseExample={{
+              user: {
+                id: "user-uuid",
+                username: "user123",
+                bidBalance: 5,
+                role: "user"
+              },
+              tokens: {
+                accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                tokenType: "Bearer",
+                expiresIn: 3600
+              }
             }}
           />
 

@@ -608,6 +608,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         password: z.string().min(6, "Password must contain at least 6 characters"),
         dateOfBirth: z.string().optional(),
         gender: z.enum(["male", "female", "other"]).optional(),
+        verificationId: z.string().uuid().optional(), // For mobile apps
       }).parse(req.body);
       
       // Check for existing users
@@ -622,12 +623,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Check phone if provided and verify OTP was completed
+      let phoneVerified = false;
       if (registerData.phone) {
-        const verifiedPhone = (req.session as any).verifiedPhone;
-        if (!verifiedPhone || verifiedPhone !== registerData.phone) {
-          return res.status(400).json({ error: "Phone number must be verified with OTP before registration" });
+        // MOBILE FLOW: Check verificationId in database (stateless)
+        if (registerData.verificationId) {
+          const otpVerification = await storage.getOtpVerification(registerData.verificationId);
+          
+          if (!otpVerification) {
+            return res.status(400).json({ error: "Invalid or expired verification ID" });
+          }
+
+          // Validate OTP verification record
+          if (otpVerification.phone !== registerData.phone) {
+            return res.status(400).json({ error: "Phone number does not match verification" });
+          }
+
+          if (otpVerification.purpose !== "registration") {
+            return res.status(400).json({ error: "Invalid verification purpose" });
+          }
+
+          if (!otpVerification.consumedAt) {
+            return res.status(400).json({ error: "OTP has not been verified yet" });
+          }
+
+          if (new Date() > otpVerification.expiresAt) {
+            return res.status(400).json({ error: "Verification has expired" });
+          }
+
+          // Check if consumedAt is within acceptable time window (10 minutes)
+          const consumedTime = new Date(otpVerification.consumedAt).getTime();
+          const currentTime = new Date().getTime();
+          const timeDifference = currentTime - consumedTime;
+          const tenMinutesInMs = 10 * 60 * 1000;
+          
+          if (timeDifference > tenMinutesInMs) {
+            return res.status(400).json({ error: "Verification has expired. Please request a new OTP" });
+          }
+
+          phoneVerified = true;
+        } 
+        // WEB FLOW: Check session (fallback for web clients)
+        else {
+          const verifiedPhone = (req.session as any).verifiedPhone;
+          if (!verifiedPhone || verifiedPhone !== registerData.phone) {
+            return res.status(400).json({ error: "Phone number must be verified with OTP before registration" });
+          }
+          phoneVerified = true;
         }
 
+        // Check if phone already registered
         const existingPhone = await storage.getUserByPhone(registerData.phone);
         if (existingPhone) {
           return res.status(400).json({ error: getErrorMessage(req, 'phoneAlreadyRegistered') });
@@ -663,10 +707,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         bidBalance: 5, // Starting bid balance
         role: "user",
         ipAddress: ipAddress,
-        isPhoneVerified: registerData.phone ? true : false,
+        isPhoneVerified: registerData.phone ? phoneVerified : false,
       });
 
-      // Clear verified phone from session after successful registration
+      // Delete OTP verification record to prevent replay attacks (mobile flow)
+      if (registerData.verificationId) {
+        await storage.deleteOtpVerification(registerData.verificationId);
+      }
+
+      // Clear verified phone from session after successful registration (web flow)
       delete (req.session as any).verifiedPhone;
 
       req.session.userId = user.id;
