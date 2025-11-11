@@ -1137,7 +1137,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/auctions/:id/bids", async (req, res) => {
     const bids = await storage.getBidsForAuction(req.params.id);
-    res.json(bids);
+    
+    // Transform to mobile-friendly format with flattened structure
+    const simplifiedBids = bids.map(bid => ({
+      id: bid.id,
+      amount: bid.amount,
+      username: bid.isBot ? bid.botName : bid.user?.username || 'Unknown',
+      timestamp: bid.createdAt,
+      isBot: bid.isBot,
+      isPrebid: bid.isPrebid
+    }));
+    
+    res.json(simplifiedBids);
   });
 
   app.get("/api/auctions/slug/:slug/bids", async (req, res) => {
@@ -1161,7 +1172,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     const bids = await storage.getBidsForAuction(auction.id);
-    res.json(bids);
+    
+    // Transform to mobile-friendly format with flattened structure
+    const simplifiedBids = bids.map(bid => ({
+      id: bid.id,
+      amount: bid.amount,
+      username: bid.isBot ? bid.botName : bid.user?.username || 'Unknown',
+      timestamp: bid.createdAt,
+      isBot: bid.isBot,
+      isPrebid: bid.isPrebid
+    }));
+    
+    res.json(simplifiedBids);
   });
 
   // Auction statistics endpoint
