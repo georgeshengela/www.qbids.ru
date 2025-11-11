@@ -170,12 +170,51 @@ export default function AdminApiDocs() {
             <i className="fas fa-lock mr-3 text-blue-600"></i>
             Аутентификация
           </h2>
+
+          {/* JWT Authentication Guide */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-bold text-blue-900 mb-3 flex items-center">
+              <i className="fas fa-key mr-2"></i>
+              JWT Token Authentication (Рекомендуется для мобильных приложений)
+            </h3>
+            <p className="text-gray-700 mb-4">
+              API поддерживает два метода аутентификации:
+            </p>
+            <div className="grid md:grid-cols-2 gap-4 mb-4">
+              <div className="bg-white rounded p-4 border border-blue-200">
+                <h4 className="font-semibold text-gray-900 mb-2">🍪 Cookie-Based (Session)</h4>
+                <p className="text-sm text-gray-600">Для веб-приложений. Автоматическая обработка сессий через cookies.</p>
+              </div>
+              <div className="bg-white rounded p-4 border border-indigo-200">
+                <h4 className="font-semibold text-gray-900 mb-2">🔑 JWT Token (Stateless)</h4>
+                <p className="text-sm text-gray-600">Для мобильных приложений. Токены в заголовке Authorization.</p>
+              </div>
+            </div>
+            
+            <h4 className="font-semibold text-gray-800 mb-2">Как использовать JWT:</h4>
+            <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700 mb-4">
+              <li>Вызовите <code className="bg-gray-800 text-white px-2 py-1 rounded text-xs">POST /api/auth/login</code> или <code className="bg-gray-800 text-white px-2 py-1 rounded text-xs">POST /api/auth/register</code></li>
+              <li>Получите <code className="bg-gray-800 text-white px-2 py-1 rounded text-xs">accessToken</code> и <code className="bg-gray-800 text-white px-2 py-1 rounded text-xs">refreshToken</code></li>
+              <li>Сохраните токены в безопасном хранилище (Keychain, SharedPreferences)</li>
+              <li>Добавляйте заголовок ко всем защищенным запросам: <code className="bg-gray-800 text-white px-2 py-1 rounded text-xs">Authorization: Bearer {"{accessToken}"}</code></li>
+              <li>Когда accessToken истечет (через 1 час), используйте <code className="bg-gray-800 text-white px-2 py-1 rounded text-xs">POST /api/auth/refresh</code> с refreshToken</li>
+            </ol>
+
+            <div className="bg-gray-900 rounded p-4">
+              <p className="text-xs text-gray-400 mb-2">Пример запроса с JWT:</p>
+              <pre className="text-xs text-green-400">
+{`GET /api/users/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json`}
+              </pre>
+            </div>
+          </div>
           
           <EndpointCard
             method="POST"
             endpoint="/api/auth/register"
             title="Регистрация пользователя"
-            description="Создание новой учетной записи пользователя"
+            description="Создание новой учетной записи пользователя. Возвращает user data + JWT tokens"
             headers={{
               "Content-Type": "application/json",
               "Accept-Language": "ka | ru | en"
@@ -184,14 +223,24 @@ export default function AdminApiDocs() {
               username: "johndoe",
               email: "john@example.com",
               password: "securePassword123",
-              phone: "+995593090000"
+              phone: "+995593090000",
+              firstName: "John",
+              lastName: "Doe"
             }}
             responseExample={{
-              id: "550e8400-e29b-41d4-a716-446655440000",
-              username: "johndoe",
-              email: "john@example.com",
-              role: "user",
-              bidsBalance: 0
+              user: {
+                id: "550e8400-e29b-41d4-a716-446655440000",
+                username: "johndoe",
+                email: "john@example.com",
+                role: "user",
+                bidBalance: 5
+              },
+              tokens: {
+                accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                tokenType: "Bearer",
+                expiresIn: 3600
+              }
             }}
           />
 
@@ -199,7 +248,7 @@ export default function AdminApiDocs() {
             method="POST"
             endpoint="/api/auth/login"
             title="Вход в систему"
-            description="Аутентификация пользователя с помощью username и password"
+            description="Аутентификация пользователя с помощью username и password. Возвращает user data + JWT tokens"
             headers={{
               "Content-Type": "application/json",
               "Accept-Language": "ka | ru | en"
@@ -209,11 +258,20 @@ export default function AdminApiDocs() {
               password: "securePassword123"
             }}
             responseExample={{
-              id: "550e8400-e29b-41d4-a716-446655440000",
-              username: "johndoe",
-              email: "john@example.com",
-              role: "user",
-              bidsBalance: 50
+              user: {
+                id: "550e8400-e29b-41d4-a716-446655440000",
+                username: "johndoe",
+                email: "john@example.com",
+                role: "user",
+                bidBalance: 50,
+                phone: "+995593090000"
+              },
+              tokens: {
+                accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                tokenType: "Bearer",
+                expiresIn: 3600
+              }
             }}
           />
 
@@ -261,12 +319,33 @@ export default function AdminApiDocs() {
 
           <EndpointCard
             method="POST"
+            endpoint="/api/auth/refresh"
+            title="Обновить Access Token"
+            description="Получить новый access token используя refresh token (для продления сессии без повторного логина)"
+            headers={{
+              "Content-Type": "application/json"
+            }}
+            requestBody={{
+              refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            }}
+            responseExample={{
+              tokens: {
+                accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                tokenType: "Bearer",
+                expiresIn: 3600
+              }
+            }}
+          />
+
+          <EndpointCard
+            method="POST"
             endpoint="/api/auth/logout"
             title="Выход из системы"
-            description="Завершить текущую сессию пользователя"
+            description="Завершить текущую сессию пользователя (только для session-based auth)"
             auth={true}
             responseExample={{
-              message: "Logged out successfully"
+              success: true
             }}
           />
         </section>

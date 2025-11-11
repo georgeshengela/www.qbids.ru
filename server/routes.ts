@@ -1017,7 +1017,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User profile
-  app.get("/api/users/profile", async (req, res) => {
+  app.get("/api/users/profile", authenticateJWT, async (req, res) => {
     if (!req.session.userId) {
       return res.status(401).json({ error: "Не авторизован" });
     }
@@ -1030,7 +1030,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(user);
   });
 
-  app.put("/api/users/profile", async (req, res) => {
+  app.put("/api/users/profile", authenticateJWT, async (req, res) => {
     if (!req.session.userId) {
       return res.status(401).json({ error: "Не авторизован" });
     }
