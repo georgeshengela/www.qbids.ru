@@ -35,13 +35,15 @@ Full-stack web application with React frontend and Express backend
 - Multi-language support (Russian, English, Georgian)
 - Bot integration for automated bidding
 - Admin panel for auction management
-- User authentication and profile management
+- User authentication and profile management with OTP verification
+- Phone number verification via SMS (SMSOffice integration)
 - Countdown timers and automatic winner determination
 - Bid history tracking
 
 ## Environment Variables
 - `DATABASE_URL` - PostgreSQL connection string (auto-configured)
 - `SESSION_SECRET` - Express session secret (auto-configured)
+- `SMSOFFICE_API_KEY` - SMSOffice API key for OTP SMS delivery
 - `NODE_ENV` - Environment mode (development/production)
 - `PORT` - Server port (default: 5000)
 
@@ -60,6 +62,18 @@ Database schema is managed with Drizzle ORM. The schema includes:
 - `bot_settings` - Bot configuration
 
 ## Recent Changes
+- **2025-11-11**: OTP Verification Implementation
+  - Created SMSOffice service (`server/services/sms-service.ts`) for sending SMS with 4-digit OTP codes
+  - Added OTP fields to user schema: otpCode, otpExpiresAt, isPhoneVerified
+  - Implemented `/api/auth/send-otp` endpoint - generates OTP, sends via SMSOffice, stores in session (10-min expiry)
+  - Implemented `/api/auth/verify-otp` endpoint - validates code, clears pendingOTP, sets verifiedPhone in session
+  - Updated `/api/auth/register` to enforce phone verification - rejects if phone provided but not verified
+  - Added OTP verification modal to AuthModal component with 4-digit input field
+  - Updated phone validation from +996 (Kyrgyzstan) to +995 (Georgian market)
+  - Added comprehensive session cleanup in all code paths (success/failure) to prevent stale verification data
+  - Security: Server-side verification enforced, session data cleared properly
+  - Architect reviewed and approved implementation
+  
 - **2025-10-29**: Complete Georgian localization
   - Updated all page titles, meta tags, and SEO content to Georgian language
   - Changed default language from Russian to Georgian (ka) across entire application
