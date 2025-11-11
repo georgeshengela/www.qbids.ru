@@ -72,6 +72,10 @@ export const translations = {
     switchToRegister: "Нет аккаунта? Зарегистрируйтесь",
     switchToLogin: "Уже есть аккаунт? Войдите",
     chooseUniqueUsername: "Выберите уникальное имя пользователя",
+    usernameAvailable: "Имя пользователя доступно",
+    usernameTaken: "Имя пользователя уже занято",
+    verify: "Проверить",
+    verifying: "Проверка...",
     
     // Profile
     profileTitle: "Мой профиль",
@@ -554,6 +558,10 @@ export const translations = {
     switchToRegister: "Don't have an account? Register",
     switchToLogin: "Already have an account? Login",
     chooseUniqueUsername: "Choose a unique username",
+    usernameAvailable: "Username is available",
+    usernameTaken: "Username is already taken",
+    verify: "Verify",
+    verifying: "Verifying...",
     
     // Profile
     profileTitle: "My Profile",
@@ -736,6 +744,10 @@ export const translations = {
     creatingAccount: "Creating account...",
     registerAndGetBids: "Sign up and get 5 free bids to get started",
     chooseUniqueUsername: "Choose a unique username",
+    usernameAvailable: "Username is available",
+    usernameTaken: "Username is already taken",
+    verify: "Verify",
+    verifying: "Verifying...",
     repeatPassword: "Repeat password",
     byRegisteringYouAgree: "By registering, you agree to",
     termsOfService: "Terms of Service",
@@ -1209,6 +1221,10 @@ export const translations = {
     creatingAccount: "ანგარიშის შექმნა...",
     registerAndGetBids: "დარეგისტრირდით და მიიღეთ 5 უფასო ფსონი დასაწყებად",
     chooseUniqueUsername: "აირჩიეთ უნიკალური მომხმარებლის სახელი",
+    usernameAvailable: "მომხმარებლის სახელი ხელმისაწვდომია",
+    usernameTaken: "მომხმარებლის სახელი უკვე დაკავებულია",
+    verify: "შემოწმება",
+    verifying: "მიმდინარეობს შემოწმება...",
     repeatPassword: "გაიმეორეთ პაროლი",
     byRegisteringYouAgree: "რეგისტრაციით, თქვენ ეთანხმებით",
     termsOfService: "მომსახურების პირობებს",

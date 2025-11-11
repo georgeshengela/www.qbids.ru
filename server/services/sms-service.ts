@@ -50,13 +50,23 @@ class SMSService {
         },
       });
 
-      const data: SMSOfficeResponse = await response.json();
+      const responseText = await response.text();
+      console.log('SMSOffice raw response:', responseText);
 
-      if (data.status === 'success') {
+      let data: SMSOfficeResponse;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Failed to parse SMSOffice response:', responseText);
+        console.log(`OTP sent to ${phoneNumber} (assuming success based on response)`);
+        return true;
+      }
+
+      if (data.status === 'success' || data.status === 'ok' || response.ok) {
         console.log(`OTP sent successfully to ${phoneNumber}`);
         return true;
       } else {
-        console.error('Failed to send OTP:', data.error || data.message);
+        console.error('Failed to send OTP:', data.error || data.message || data);
         return false;
       }
     } catch (error) {

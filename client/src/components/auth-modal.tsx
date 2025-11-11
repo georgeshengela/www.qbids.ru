@@ -527,7 +527,7 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
                         ) : phoneVerified ? (
                           <><i className="fas fa-check mr-1"></i> Verified</>
                         ) : (
-                          'Verify'
+                          t('verify')
                         )}
                       </Button>
                     </div>
@@ -673,9 +673,9 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
                 data-testid="button-submit-otp"
               >
                 {otpVerifying ? (
-                  <><i className="fas fa-spinner fa-spin mr-2"></i> Verifying...</>
+                  <><i className="fas fa-spinner fa-spin mr-2"></i> {t('verifying')}</>
                 ) : (
-                  'Verify'
+                  t('verify')
                 )}
               </Button>
             </div>

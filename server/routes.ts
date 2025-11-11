@@ -464,10 +464,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const existingUser = await storage.getUserByUsername(username);
       if (existingUser) {
-        return res.json({ valid: false, message: "Имя пользователя уже занято" });
+        return res.json({ valid: false, message: getErrorMessage(req, 'usernameTaken') });
       }
 
-      res.json({ valid: true, message: "Имя пользователя доступно" });
+      res.json({ valid: true, message: getErrorMessage(req, 'usernameAvailable') });
     } catch (error: any) {
       if (error.errors) {
         return res.json({ valid: false, message: error.errors[0].message });
