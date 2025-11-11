@@ -9,6 +9,7 @@ import { auctionService } from "./services/auction-service";
 import { timerService } from "./services/timer-service";
 import { botService } from "./services/bot-service";
 import { smsService } from "./services/sms-service";
+import { otpService } from "./services/otp-service";
 import { setSocketIO } from "./socket";
 import { insertUserSchema, insertAuctionSchema, insertBotSchema, insertSettingsSchema } from "@shared/schema";
 import { z } from "zod";
@@ -531,33 +532,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Phone number already registered" });
       }
 
-      const otpCode = smsService.generateOTP();
-      const otpExpiresAt = new Date();
-      otpExpiresAt.setMinutes(otpExpiresAt.getMinutes() + 10);
+      // Get client IP for rate limiting
+      const ipAddress = req.ip || req.socket.remoteAddress;
 
-      const smsSent = await smsService.sendOTP(phone, otpCode);
+      // Create and send OTP using stateless service
+      const result = await otpService.createAndSendOtp(phone, 'registration', ipAddress);
       
-      if (!smsSent) {
+      if (!result) {
         return res.status(500).json({ error: "Failed to send OTP. Please try again." });
       }
-
-      (req.session as any).pendingOTP = {
-        phone,
-        code: otpCode,
-        expiresAt: otpExpiresAt.toISOString(),
-      };
-
-      await new Promise<void>((resolve, reject) => {
-        req.session.save((err) => {
-          if (err) reject(err);
-          else resolve();
-        });
-      });
 
       res.json({ 
         success: true, 
         message: "OTP sent successfully",
-        expiresAt: otpExpiresAt.toISOString(),
+        verificationId: result.verificationId,
+        expiresIn: 600, // 10 minutes in seconds
       });
     } catch (error: any) {
       console.error("Send OTP error:", error);
@@ -570,55 +559,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/auth/verify-otp", async (req, res) => {
     try {
-      const { phone, code } = z.object({
-        phone: z.string().regex(/^\+995\d{9}$/, "Phone number must be in format +995XXXXXXXXX"),
+      const { verificationId, code, phone } = z.object({
+        verificationId: z.string().uuid(),
         code: z.string().length(4, "OTP code must be 4 digits"),
+        phone: z.string().regex(/^\+995\d{9}$/, "Phone number must be in format +995XXXXXXXXX").optional(),
       }).parse(req.body);
 
-      const pendingOTP = (req.session as any).pendingOTP;
-      
-      if (!pendingOTP) {
-        return res.status(400).json({ error: "No OTP request found. Please request a new OTP." });
+      // Verify OTP using stateless service
+      const result = await otpService.verifyOtp(verificationId, code, phone);
+
+      if (!result.success) {
+        return res.status(400).json({ error: result.error });
       }
 
-      if (pendingOTP.phone !== phone) {
-        return res.status(400).json({ error: "Phone number does not match OTP request." });
-      }
-
-      if (new Date() > new Date(pendingOTP.expiresAt)) {
-        delete (req.session as any).pendingOTP;
-        await new Promise<void>((resolve) => {
-          req.session.save(() => resolve());
+      // For web sessions, store verified phone temporarily
+      if (req.session && result.verifiedPhone) {
+        (req.session as any).verifiedPhone = result.verifiedPhone;
+        await new Promise<void>((resolve, reject) => {
+          req.session.save((err) => {
+            if (err) reject(err);
+            else resolve();
+          });
         });
-        return res.status(400).json({ error: "OTP has expired. Please request a new one." });
       }
-
-      if (pendingOTP.code !== code) {
-        return res.status(400).json({ error: "Invalid OTP code." });
-      }
-
-      // Clear pending OTP and set verified phone
-      delete (req.session as any).pendingOTP;
-      (req.session as any).verifiedPhone = phone;
-
-      await new Promise<void>((resolve, reject) => {
-        req.session.save((err) => {
-          if (err) reject(err);
-          else resolve();
-        });
-      });
 
       res.json({ 
         success: true, 
         message: "Phone number verified successfully",
+        verifiedPhone: result.verifiedPhone,
       });
     } catch (error: any) {
       console.error("Verify OTP error:", error);
-      // Clear pending OTP on error
-      delete (req.session as any).pendingOTP;
-      await new Promise<void>((resolve) => {
-        req.session.save(() => resolve());
-      });
       if (error.errors) {
         return res.status(400).json({ error: error.errors[0].message });
       }

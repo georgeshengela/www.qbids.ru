@@ -322,7 +322,7 @@ Content-Type: application/json`}
             method="POST"
             endpoint="/api/auth/send-otp"
             title="Отправить OTP код"
-            description="Отправить 4-значный OTP код верификации на указанный номер телефона через SMS (SMSOffice). Код действителен 10 минут. Для мобильных приложений - используйте этот метод для верификации телефона перед регистрацией."
+            description="Отправить 4-значный OTP код верификации на указанный номер телефона через SMS (SMSOffice). Код действителен 10 минут. Возвращает verificationId для stateless проверки (работает с мобильными приложениями без сессий)."
             headers={{
               "Content-Type": "application/json",
               "Accept-Language": "ka | ru | en"
@@ -332,7 +332,8 @@ Content-Type: application/json`}
             }}
             responseExample={{
               success: true,
-              message: "OTP code sent successfully",
+              message: "OTP sent successfully",
+              verificationId: "550e8400-e29b-41d4-a716-446655440000",
               expiresIn: 600
             }}
           />
@@ -341,14 +342,15 @@ Content-Type: application/json`}
             method="POST"
             endpoint="/api/auth/verify-otp"
             title="Проверить OTP код"
-            description="Верифицировать 4-значный OTP код для подтверждения номера телефона. После успешной верификации телефон считается подтвержденным и может быть использован при регистрации. Для мобильных приложений - вызовите этот метод после получения OTP кода от пользователя."
+            description="Верифицировать 4-значный OTP код используя verificationId от send-otp. Stateless проверка с использованием hashed OTP кодов в базе данных. Работает для веб (сессии) и мобильных приложений (JWT tokens)."
             headers={{
               "Content-Type": "application/json",
               "Accept-Language": "ka | ru | en"
             }}
             requestBody={{
-              phone: "+995593090000",
-              code: "1234"
+              verificationId: "550e8400-e29b-41d4-a716-446655440000",
+              code: "1234",
+              phone: "+995593090000"
             }}
             responseExample={{
               success: true,

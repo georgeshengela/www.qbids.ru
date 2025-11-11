@@ -62,29 +62,50 @@ Database schema is managed with Drizzle ORM. The schema includes:
 - `bot_settings` - Bot configuration
 
 ## Recent Changes
-- **2025-11-11**: OTP Verification & Mobile API Documentation
-  - **Complete Profile Modal Removed**: Disabled modal that appeared after login/registration for smoother user experience
-  - **OTP API Documentation Added**: Added comprehensive API documentation for mobile applications
-    - `POST /api/auth/send-otp` - Send 4-digit OTP code via SMS (SMSOffice)
-    - `POST /api/auth/verify-otp` - Verify OTP code for phone number confirmation
-    - `POST /api/auth/validate-phone` - Check phone number availability
-    - Mobile apps can now verify users before registration using stateless OTP flow
-    - Added to admin API docs page (`/admin/api-docs`) with request/response examples
-  - **Georgian Translation Complete**: All OTP verification UI fully translated to Georgian
-    - OTP modal: title, descriptions, buttons, validation messages
-    - Email validation now uses Georgian error messages (removed hardcoded English from Zod)
-    - Removed duplicate translation keys
-  - **OTP Verification Implementation**:
-    - Created SMSOffice service (`server/services/sms-service.ts`) for sending SMS with 4-digit OTP codes
-    - Added OTP fields to user schema: otpCode, otpExpiresAt, isPhoneVerified
-    - Implemented `/api/auth/send-otp` endpoint - generates OTP, sends via SMSOffice, stores in session (10-min expiry)
-    - Implemented `/api/auth/verify-otp` endpoint - validates code, clears pendingOTP, sets verifiedPhone in session
-    - Updated `/api/auth/register` to enforce phone verification - rejects if phone provided but not verified
-    - Added OTP verification modal to AuthModal component with 4-digit input field
-    - Updated phone validation from +996 (Kyrgyzstan) to +995 (Georgian market)
-    - Added comprehensive session cleanup in all code paths (success/failure) to prevent stale verification data
-    - Security: Server-side verification enforced, session data cleared properly
-    - Architect reviewed and approved implementation
+- **2025-11-11**: Stateless OTP Verification System (Mobile & Web Compatible)
+  - **✅ CRITICAL FIX**: Migrated OTP system from session-based to stateless database storage
+    - **Problem**: Previous session-based OTP storage didn't work for mobile apps (JWT/stateless)
+    - **Solution**: Created `otp_verifications` table with hashed OTP codes and verificationId tokens
+    - **Result**: OTP verification now works for BOTH web (sessions) and mobile (JWT tokens)
+  
+  - **Database Schema**:
+    - Created `otp_verifications` table with bcrypt-hashed OTP storage
+    - Indexes: (phone, purpose), expiresAt for efficient lookups and cleanup
+    - Fields: id (UUID/verificationId), phone, otpHash, expiresAt, consumedAt, attemptCount, purpose, ipAddress
+    - Supports stateless verification without session dependency
+  
+  - **OTP Service Layer** (`server/services/otp-service.ts`):
+    - `createAndSendOtp()` - Generates 4-digit OTP, hashes with bcrypt (10 rounds), stores in DB, sends SMS, returns verificationId
+    - `verifyOtp()` - Validates verificationId + code using constant-time bcrypt comparison
+    - Security features: Max 5 attempts, 10-minute expiry, one-time use (consumedAt flag), IP tracking
+    - `cleanupExpiredOtps()` - Removes expired verification records
+  
+  - **API Endpoints** (Stateless & Mobile-Compatible):
+    - `POST /api/auth/send-otp` - Returns `{ success, verificationId, expiresIn }`
+    - `POST /api/auth/verify-otp` - Accepts `{ verificationId, code, phone }`, returns `{ success, verifiedPhone }`
+    - Works without sessions - mobile apps can use JWT tokens
+    - Web clients get additional session storage for convenience
+  
+  - **Frontend Updates**:
+    - Auth modal stores verificationId from send-otp response
+    - Sends verificationId with verify-otp request
+    - Backwards compatible with web session flow
+  
+  - **Security & Best Practices**:
+    - ✅ Bcrypt hashing with 10 salt rounds
+    - ✅ Constant-time comparison (prevents timing attacks)
+    - ✅ One-time use enforcement (consumedAt flag)
+    - ✅ Rate limiting support (attempt counter, IP address tracking)
+    - ✅ Automatic expiry (10 minutes)
+    - ✅ Stateless verification (works with JWT tokens)
+  
+  - **API Documentation**:
+    - Updated `/admin/api-docs` with new stateless OTP flow
+    - Documented verificationId parameter for mobile integrations
+    - Examples show both web and mobile usage patterns
+  
+  - **Architect Review**: ✅ PASSED - Confirmed production-ready for both web and mobile
+    - Recommended enhancements: Request-level throttling, integration tests, cleanup cron job
   
 - **2025-10-29**: Complete Georgian localization
   - Updated all page titles, meta tags, and SEO content to Georgian language

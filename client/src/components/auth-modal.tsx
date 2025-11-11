@@ -66,6 +66,7 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
   const [otpVerifying, setOtpVerifying] = useState(false);
   const [phoneVerified, setPhoneVerified] = useState(false);
   const [currentPhone, setCurrentPhone] = useState("");
+  const [verificationId, setVerificationId] = useState<string | null>(null);
   const { toast } = useToast();
   const { login, register, loginPending, registerPending } = useAuth();
   const { t } = useLanguage();
@@ -180,6 +181,8 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
         throw new Error(data.error || "Failed to send OTP");
       }
 
+      // Store verificationId for stateless OTP verification
+      setVerificationId(data.verificationId);
       setCurrentPhone(phone);
       setOtpModalOpen(true);
       toast({
@@ -207,12 +210,25 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
       return;
     }
 
+    if (!verificationId) {
+      toast({
+        title: "Error",
+        description: "No verification ID found. Please request a new OTP",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setOtpVerifying(true);
     try {
       const response = await fetch("/api/auth/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: currentPhone, code: otpCode }),
+        body: JSON.stringify({ 
+          verificationId, 
+          code: otpCode,
+          phone: currentPhone 
+        }),
       });
 
       const data = await response.json();
@@ -224,6 +240,7 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
       setPhoneVerified(true);
       setOtpModalOpen(false);
       setOtpCode("");
+      setVerificationId(null);
       toast({
         title: "Phone Verified",
         description: "Your phone number has been verified successfully",
