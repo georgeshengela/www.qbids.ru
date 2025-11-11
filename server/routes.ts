@@ -478,9 +478,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/auth/validate-email", async (req, res) => {
     try {
-      const { email } = z.object({
-        email: z.string().email(getErrorMessage(req, 'invalidEmailFormat')),
-      }).parse(req.body);
+      const { email } = req.body;
+      
+      // Manual email validation to avoid Zod's hardcoded error messages
+      if (!email || typeof email !== 'string' || !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        return res.json({ valid: false, message: getErrorMessage(req, 'invalidEmailFormat') });
+      }
 
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
@@ -489,9 +492,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ valid: true, message: getErrorMessage(req, 'emailAvailable') });
     } catch (error: any) {
-      if (error.errors) {
-        return res.json({ valid: false, message: error.errors[0].message });
-      }
       res.json({ valid: false, message: getErrorMessage(req, 'invalidEmailFormat') });
     }
   });
