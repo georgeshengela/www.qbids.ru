@@ -106,6 +106,67 @@ Database schema is managed with Drizzle ORM. The schema includes:
   
   - **Architect Review**: ✅ PASSED - Confirmed production-ready for both web and mobile
     - Recommended enhancements: Request-level throttling, integration tests, cleanup cron job
+
+- **2025-11-11**: Mobile Authentication Support (React Native Compatible)
+  - **✅ CRITICAL FIX**: Updated `/api/auth/register` to support JWT-based mobile apps
+    - **Problem**: Register endpoint only checked `req.session.verifiedPhone`, blocking mobile registration
+    - **Solution**: Added optional `verificationId` parameter to register endpoint
+    - **Result**: Mobile apps can now complete full registration flow using JWT tokens
+  
+  - **Mobile Registration Flow**:
+    1. `POST /api/auth/send-otp` → Returns `verificationId` + sends SMS
+    2. `POST /api/auth/verify-otp` → Validates code, consumes OTP, returns `verifiedPhone`
+    3. `POST /api/auth/register` → Accepts `verificationId`, validates OTP record, creates user, returns JWT tokens
+    4. Mobile app stores JWT tokens (accessToken, refreshToken) for authenticated requests
+  
+  - **Register Endpoint Updates**:
+    - Accepts optional `verificationId` parameter for mobile clients
+    - Validates OTP verification record in database:
+      - Phone number match
+      - Purpose = "registration"
+      - OTP consumed (consumedAt is set)
+      - Not expired (within 10 minutes of verification)
+    - Deletes OTP record after successful registration (prevents replay attacks)
+    - Falls back to session-based verification for web clients (backwards compatible)
+    - Returns JWT tokens (accessToken, refreshToken) for stateless authentication
+  
+  - **Protected Endpoints**:
+    All protected endpoints use `authenticateJWT` middleware that accepts Bearer tokens:
+    - `/api/auth/me` - Get current user info
+    - `/api/auctions/:id/bid` - Place bid
+    - `/api/auctions/:id/prebid` - Place prebid
+    - `/api/users/profile` - Get/update profile
+    - `/api/payment/create-session` - Create payment session
+    - All other authenticated endpoints
+  
+  - **Mobile App Usage**:
+    ```javascript
+    // 1. Register
+    const registerResponse = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username, email, phone, password,
+        verificationId // From verify-otp response
+      })
+    });
+    const { tokens } = await registerResponse.json();
+    
+    // 2. Store tokens
+    await AsyncStorage.setItem('accessToken', tokens.accessToken);
+    await AsyncStorage.setItem('refreshToken', tokens.refreshToken);
+    
+    // 3. Make authenticated requests
+    const response = await fetch('/api/auth/me', {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+    ```
+  
+  - **API Documentation**: Updated `/admin/api-docs` with complete mobile flow examples
+  - **Architect Review**: ✅ PASSED - Confirmed production-ready for React Native apps
+    - Recommended enhancements: Integration tests, real mobile client smoke test
   
 - **2025-10-29**: Complete Georgian localization
   - Updated all page titles, meta tags, and SEO content to Georgian language
