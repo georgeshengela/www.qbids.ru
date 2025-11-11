@@ -48,6 +48,20 @@ The platform is a full-stack web application utilizing a React frontend and an E
 
 ## Recent Changes (November 11, 2025)
 
+### Comprehensive Bid History API for Mobile (NEW)
+- **Created `/api/users/bid-history` endpoint** for mobile app integration
+- Single endpoint returns complete user bid history with categorization:
+  - `bids`: All regular bids with auction details
+  - `prebids`: All prebids with auction details
+  - `activeBids`: Filtered active bids (status = 'live')
+  - `upcomingPrebids`: Filtered upcoming prebids (status = 'upcoming')
+  - `finishedHistory`: Combined finished bids AND prebids (status = 'finished'), sorted by timestamp
+  - `summary`: Statistics including totalBids, totalPrebids, counts for each category
+- Mobile-friendly flattened structure with complete auction data
+- Includes type field ('bid' or 'prebid') for easy differentiation
+- Matches web UI bid history page functionality
+- Critical fix: finishedHistory includes BOTH finished bids and finished prebids (no omissions)
+
 ### User Stats API Fixed
 - **Fixed `/api/users/stats` endpoint** to return correct fields matching API documentation
 - Changed from `{activeBids, wonAuctions, activePrebids}` to `{totalBids, auctionsWon, auctionsParticipated, totalSpent}`
