@@ -584,43 +584,6 @@ Content-Type: application/json`}
           />
         </section>
 
-        {/* Payments Section */}
-        <section className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-            <i className="fas fa-credit-card mr-3 text-blue-600"></i>
-            Платежи
-          </h2>
-
-          <EndpointCard
-            method="POST"
-            endpoint="/api/payment/create-session"
-            title="Создать платежную сессию"
-            description="Создать сессию для покупки пакета ставок через Digiseller"
-            auth={true}
-            requestBody={{
-              packageId: 1,
-              bidsAmount: 50,
-              amount: 10.00
-            }}
-            responseExample={{
-              transactionId: "txn_123456",
-              status: "pending"
-            }}
-          />
-
-          <EndpointCard
-            method="POST"
-            endpoint="/api/payment/refresh-balance"
-            title="Обновить баланс"
-            description="Обновить баланс ставок пользователя после платежа"
-            auth={true}
-            responseExample={{
-              bidsBalance: 100,
-              message: "Balance updated successfully"
-            }}
-          />
-        </section>
-
         {/* Bids Section */}
         <section className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
