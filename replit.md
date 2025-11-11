@@ -62,6 +62,26 @@ Database schema is managed with Drizzle ORM. The schema includes:
 - `bot_settings` - Bot configuration
 
 ## Recent Changes
+- **2025-11-11**: Sample Auction Data
+  - **Added 5 upcoming auctions**:
+    - iPhone 15 Pro 256GB (₾4,899) - starts in ~2 hours
+    - Samsung Galaxy S24 Ultra (₾4,299) - starts in ~5 hours
+    - MacBook Air M3 15" (₾5,499) - starts in ~24 hours
+    - Sony PlayStation 5 (₾2,199) - starts in ~30 hours
+    - AirPods Pro 2nd Gen (₾899) - starts in ~48 hours
+  
+  - **Added 6 finished auctions** with bid history:
+    - Bose QuietComfort 45 (₾1,199 → ₾18.40, 92 bids)
+    - Canon EOS R6 Mark II (₾8,999 → ₾124.80, 624 bids)
+    - Dyson V15 Detect (₾2,299 → ₾28.60, 143 bids)
+    - Samsung 65" QLED TV (₾3,499 → ₾67.20, 336 bids)
+    - Apple Watch Series 9 (₾1,599 → ₾32.40, 162 bids)
+    - iPad Pro 12.9" M2 (₾4,299 → ₾45.80, 229 bids)
+  
+  - All auctions use high-quality Unsplash images
+  - Finished auctions have realistic bid histories
+  - Admin user set as winner for all finished auctions
+
 - **2025-11-11**: Stateless OTP Verification System (Mobile & Web Compatible)
   - **✅ CRITICAL FIX**: Migrated OTP system from session-based to stateless database storage
     - **Problem**: Previous session-based OTP storage didn't work for mobile apps (JWT/stateless)
