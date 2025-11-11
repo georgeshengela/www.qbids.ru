@@ -99,10 +99,10 @@ export interface IStorage {
     }>;
   }>;
   getUserStats(userId: string): Promise<{
-    activeBids: number;
-    wonAuctions: number;
+    totalBids: number;
+    auctionsWon: number;
+    auctionsParticipated: number;
     totalSpent: string;
-    activePrebids: number;
   }>;
   
   // Settings methods
@@ -549,23 +549,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserStats(userId: string): Promise<{
-    activeBids: number;
-    wonAuctions: number;
+    totalBids: number;
+    auctionsWon: number;
+    auctionsParticipated: number;
     totalSpent: string;
-    activePrebids: number;
   }> {
-    const [activeBidsResult] = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(bids)
-      .innerJoin(auctions, eq(bids.auctionId, auctions.id))
-      .where(and(eq(bids.userId, userId), eq(auctions.status, "live")));
-
-    const [wonAuctionsResult] = await db
-      .select({ count: sql<number>`count(*)` })
-      .from(auctions)
-      .where(eq(auctions.winnerId, userId));
-
-    // Calculate total spent as: (number of bids + number of prebids) × 0.01 сом per bid
+    // Total bids count (regular bids + prebids)
     const [totalBidsResult] = await db
       .select({ count: sql<number>`count(*)` })
       .from(bids)
@@ -576,19 +565,40 @@ export class DatabaseStorage implements IStorage {
       .from(prebids)
       .where(eq(prebids.userId, userId));
 
-    const totalSpent = (((totalBidsResult?.count || 0) + (totalPrebidsResult?.count || 0)) * 0.01).toFixed(2);
+    const totalBids = (totalBidsResult?.count || 0) + (totalPrebidsResult?.count || 0);
 
-    const [activePrebidsResult] = await db
+    // Auctions won
+    const [wonAuctionsResult] = await db
       .select({ count: sql<number>`count(*)` })
+      .from(auctions)
+      .where(eq(auctions.winnerId, userId));
+
+    // Auctions participated (unique auction IDs from bids and prebids)
+    const uniqueBidAuctions = await db
+      .selectDistinct({ auctionId: bids.auctionId })
+      .from(bids)
+      .where(eq(bids.userId, userId));
+
+    const uniquePrebidAuctions = await db
+      .selectDistinct({ auctionId: prebids.auctionId })
       .from(prebids)
-      .innerJoin(auctions, eq(prebids.auctionId, auctions.id))
-      .where(and(eq(prebids.userId, userId), eq(auctions.status, "upcoming")));
+      .where(eq(prebids.userId, userId));
+
+    // Combine and get unique auction IDs
+    const allAuctionIds = new Set([
+      ...uniqueBidAuctions.map(b => b.auctionId),
+      ...uniquePrebidAuctions.map(p => p.auctionId)
+    ]);
+    const auctionsParticipated = allAuctionIds.size;
+
+    // Calculate total spent: (number of bids + prebids) × 0.01 GEL per bid
+    const totalSpent = (totalBids * 0.01).toFixed(2);
 
     return {
-      activeBids: activeBidsResult?.count || 0,
-      wonAuctions: wonAuctionsResult?.count || 0,
-      totalSpent: totalSpent,
-      activePrebids: activePrebidsResult?.count || 0,
+      totalBids,
+      auctionsWon: wonAuctionsResult?.count || 0,
+      auctionsParticipated,
+      totalSpent,
     };
   }
 
