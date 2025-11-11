@@ -45,3 +45,23 @@ The platform is a full-stack web application utilizing a React frontend and an E
 - **Socket.IO**: WebSocket library for real-time communication.
 - **SMSOffice**: Third-party SMS gateway for OTP delivery.
 - **Unsplash**: Used for high-quality auction item images.
+
+## Recent Changes (November 11, 2025)
+
+### User Stats API Fixed
+- **Fixed `/api/users/stats` endpoint** to return correct fields matching API documentation
+- Changed from `{activeBids, wonAuctions, activePrebids}` to `{totalBids, auctionsWon, auctionsParticipated, totalSpent}`
+- `totalBids`: Total count of all bids + prebids placed by user
+- `auctionsWon`: Number of auctions user has won
+- `auctionsParticipated`: Count of unique auctions user has bid in (combines both bids and prebids tables)
+- `totalSpent`: Total amount spent on bids (totalBids × 0.01 GEL)
+
+### Bid History API Simplified (Mobile-Friendly)
+- **Updated bid history endpoints** to return flattened, mobile-friendly response format
+- Endpoints: `/api/auctions/:id/bids` and `/api/auctions/slug/:slug/bids`
+- Response now includes direct `username` and `timestamp` fields (no nested user object)
+- Easier to consume in React Native and other mobile frameworks
+
+### Bid Increment Fixed
+- **Fixed bid increment** from 0.20 GEL to 0.01 GEL across all 11 auctions in database
+- All new bids will now increment auction price by 0.01 GEL instead of 0.20 GEL
