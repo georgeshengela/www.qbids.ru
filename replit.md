@@ -62,6 +62,25 @@ Database schema is managed with Drizzle ORM. The schema includes:
 - `bot_settings` - Bot configuration
 
 ## Recent Changes
+- **2025-11-11**: CORS Configuration for Mobile Apps
+  - **✅ CRITICAL FIX**: Added CORS middleware to allow mobile app connections
+    - **Problem**: Mobile apps getting CORS errors when making API requests
+    - **Solution**: Configured Express CORS middleware with proper settings
+    - **Result**: Mobile apps can now make cross-origin requests to the API
+  
+  - **CORS Configuration**:
+    - `origin: true` - Allow all origins (required for mobile apps)
+    - `credentials: true` - Allow cookies and authentication headers
+    - `methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']` - All HTTP methods
+    - `allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Accept-Language', 'X-Requested-With']`
+    - `exposedHeaders: ['Set-Cookie']` - Expose Set-Cookie header for session management
+    - `maxAge: 86400` - Cache preflight requests for 24 hours
+  
+  - **Mobile App Usage**:
+    - No special configuration needed on mobile side
+    - Just make regular HTTP requests with Authorization header
+    - CORS is handled automatically by the server
+
 - **2025-11-11**: Sample Auction Data
   - **Added 5 upcoming auctions**:
     - iPhone 15 Pro 256GB (₾4,899) - starts in ~2 hours

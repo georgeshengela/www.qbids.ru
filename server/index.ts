@@ -1,4 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
+import cors from "cors";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { auctionService } from "./services/auction-service";
@@ -10,6 +11,16 @@ const app = express();
 
 // Trust the Replit proxy so sessions work correctly
 app.set('trust proxy', 1);
+
+// CORS configuration for mobile apps
+app.use(cors({
+  origin: true, // Allow all origins (required for mobile apps)
+  credentials: true, // Allow cookies and authentication headers
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Accept-Language', 'X-Requested-With'],
+  exposedHeaders: ['Set-Cookie'],
+  maxAge: 86400, // Cache preflight requests for 24 hours
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
