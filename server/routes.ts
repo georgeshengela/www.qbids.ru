@@ -11,6 +11,7 @@ import { botService } from "./services/bot-service";
 import { setSocketIO } from "./socket";
 import { insertUserSchema, insertAuctionSchema, insertBotSchema, insertSettingsSchema } from "@shared/schema";
 import { z } from "zod";
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken, authenticateJWT } from "./jwt";
 
 // Multilingual error messages
 const errorMessages = {
@@ -580,6 +581,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       req.session.userId = user.id;
       req.session.userRole = user.role;
 
+      // Generate JWT tokens for mobile/API clients
+      const accessToken = generateAccessToken({
+        userId: user.id,
+        username: user.username,
+        role: user.role,
+      });
+      const refreshToken = generateRefreshToken({
+        userId: user.id,
+      });
+
       // Explicitly save the session before responding
       req.session.save((err) => {
         if (err) {
@@ -588,7 +599,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         console.log("Session saved successfully! Session ID:", req.sessionID, "User ID:", req.session.userId);
         console.log("Session cookie being set:", req.session.cookie);
-        res.json({ user: { id: user.id, username: user.username, bidBalance: user.bidBalance, role: user.role } });
+        
+        // Return both user data and JWT tokens
+        res.json({ 
+          user: { 
+            id: user.id, 
+            username: user.username, 
+            bidBalance: user.bidBalance, 
+            role: user.role 
+          },
+          tokens: {
+            accessToken,
+            refreshToken,
+            tokenType: "Bearer",
+            expiresIn: 3600 // 1 hour in seconds
+          }
+        });
       });
     } catch (error: any) {
       console.error("Registration error:", error);
@@ -618,6 +644,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       req.session.userId = user.id;
       req.session.userRole = user.role;
 
+      // Generate JWT tokens for mobile/API clients
+      const accessToken = generateAccessToken({
+        userId: user.id,
+        username: user.username,
+        role: user.role,
+      });
+      const refreshToken = generateRefreshToken({
+        userId: user.id,
+      });
+
       // Explicitly save the session before responding
       req.session.save((err) => {
         if (err) {
@@ -626,7 +662,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         console.log("Session saved successfully! Session ID:", req.sessionID, "User ID:", req.session.userId);
         console.log("Session cookie being set:", req.session.cookie);
-        res.json({ user: { id: user.id, username: user.username, bidBalance: user.bidBalance, role: user.role } });
+        
+        // Return both user data and JWT tokens
+        res.json({ 
+          user: { 
+            id: user.id, 
+            username: user.username, 
+            bidBalance: user.bidBalance, 
+            role: user.role,
+            email: user.email,
+            phone: user.phone
+          },
+          tokens: {
+            accessToken,
+            refreshToken,
+            tokenType: "Bearer",
+            expiresIn: 3600 // 1 hour in seconds
+          }
+        });
       });
     } catch (error) {
       res.status(400).json({ error: getErrorMessage(req, 'invalidData') });
@@ -637,6 +690,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
     req.session.destroy(() => {
       res.json({ success: true });
     });
+  });
+
+  // JWT Token Refresh Endpoint
+  app.post("/api/auth/refresh", async (req, res) => {
+    try {
+      const { refreshToken } = z.object({
+        refreshToken: z.string(),
+      }).parse(req.body);
+
+      const payload = verifyRefreshToken(refreshToken);
+      if (!payload) {
+        return res.status(401).json({ error: "Invalid or expired refresh token" });
+      }
+
+      // Get user to generate new tokens
+      const user = await storage.getUser(payload.userId);
+      if (!user) {
+        return res.status(404).json({ error: getErrorMessage(req, 'userNotFound') });
+      }
+
+      // Generate new access token
+      const newAccessToken = generateAccessToken({
+        userId: user.id,
+        username: user.username,
+        role: user.role,
+      });
+
+      // Optionally generate new refresh token (token rotation for security)
+      const newRefreshToken = generateRefreshToken({
+        userId: user.id,
+      });
+
+      res.json({
+        tokens: {
+          accessToken: newAccessToken,
+          refreshToken: newRefreshToken,
+          tokenType: "Bearer",
+          expiresIn: 3600 // 1 hour in seconds
+        }
+      });
+    } catch (error) {
+      res.status(400).json({ error: "Invalid request" });
+    }
   });
 
   app.get("/api/auth/me", async (req, res) => {
