@@ -26,6 +26,7 @@ const createLoginSchema = (t: any) => z.object({
 const createRegisterSchema = (t: any) => z.object({
   username: z.string().min(3, t("loginMinLength")),
   email: z.string().email(t("invalidEmailFormat")),
+  phone: z.string().regex(/^\+995\d{9}$/, "Phone must be in format +995XXXXXXXXX").optional(),
   password: z.string().min(6, t("passwordMinLength")),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -41,6 +42,7 @@ type LoginData = {
 type RegisterData = {
   username: string;
   email: string;
+  phone?: string;
   password: string;
   confirmPassword: string;
 };
@@ -58,6 +60,12 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
     email: { valid: null, message: "" }
   });
   const [validatingField, setValidatingField] = useState<string | null>(null);
+  const [otpModalOpen, setOtpModalOpen] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [otpSending, setOtpSending] = useState(false);
+  const [otpVerifying, setOtpVerifying] = useState(false);
+  const [phoneVerified, setPhoneVerified] = useState(false);
+  const [currentPhone, setCurrentPhone] = useState("");
   const { toast } = useToast();
   const { login, register, loginPending, registerPending } = useAuth();
   const { t } = useLanguage();
@@ -76,6 +84,7 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
     defaultValues: {
       username: "",
       email: "",
+      phone: "",
       password: "",
       confirmPassword: "",
     },
@@ -146,7 +155,100 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
     }
   };
 
+  const handleSendOTP = async () => {
+    const phone = registerForm.getValues("phone");
+    if (!phone || !phone.match(/^\+995\d{9}$/)) {
+      toast({
+        title: "Invalid Phone Number",
+        description: "Please enter a valid Georgian phone number (+995XXXXXXXXX)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setOtpSending(true);
+    try {
+      const response = await fetch("/api/auth/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to send OTP");
+      }
+
+      setCurrentPhone(phone);
+      setOtpModalOpen(true);
+      toast({
+        title: "OTP Sent",
+        description: "Please check your phone for the verification code",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to send OTP",
+        variant: "destructive",
+      });
+    } finally {
+      setOtpSending(false);
+    }
+  };
+
+  const handleVerifyOTP = async () => {
+    if (otpCode.length !== 4) {
+      toast({
+        title: "Invalid OTP",
+        description: "Please enter the 4-digit code",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setOtpVerifying(true);
+    try {
+      const response = await fetch("/api/auth/verify-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: currentPhone, code: otpCode }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Invalid OTP code");
+      }
+
+      setPhoneVerified(true);
+      setOtpModalOpen(false);
+      setOtpCode("");
+      toast({
+        title: "Phone Verified",
+        description: "Your phone number has been verified successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Verification Failed",
+        description: error.message || "Invalid OTP code",
+        variant: "destructive",
+      });
+    } finally {
+      setOtpVerifying(false);
+    }
+  };
+
   const handleRegister = async (data: RegisterData) => {
+    if (data.phone && !phoneVerified) {
+      toast({
+        title: "Phone Not Verified",
+        description: "Please verify your phone number before registering",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { confirmPassword, ...registerData } = data;
       await register(registerData);
@@ -161,6 +263,8 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
       onLoginSuccess();
       onClose();
       registerForm.reset();
+      setPhoneVerified(false);
+      setCurrentPhone("");
       // Welcome modal will automatically show from useAuth hook
     } catch (error: any) {
       toast({
@@ -170,8 +274,6 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
       });
     }
   };
-
-
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -386,6 +488,61 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
                   </div>
 
                   <div className="space-y-2">
+                    <Label htmlFor="phone" className="text-sm font-medium text-slate-700 flex items-center">
+                      <i className="fas fa-phone mr-2 text-slate-400 text-xs"></i>
+                      Phone Number (Optional)
+                    </Label>
+                    <div className="flex gap-2">
+                      <div className="relative flex-1">
+                        <Input
+                          id="phone"
+                          type="tel"
+                          placeholder="+995XXXXXXXXX"
+                          className={`h-11 border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 rounded-lg bg-white ${
+                            phoneVerified ? 'border-green-500 bg-green-50' : ''
+                          }`}
+                          {...registerForm.register("phone")}
+                          disabled={phoneVerified}
+                          data-testid="input-phone"
+                        />
+                        {phoneVerified && (
+                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                            <i className="fas fa-check-circle text-green-500 text-sm"></i>
+                          </div>
+                        )}
+                      </div>
+                      <Button
+                        type="button"
+                        onClick={handleSendOTP}
+                        disabled={otpSending || phoneVerified}
+                        className={`h-11 px-4 ${
+                          phoneVerified 
+                            ? 'bg-green-600 hover:bg-green-700' 
+                            : 'bg-blue-600 hover:bg-blue-700'
+                        } text-white font-medium rounded-lg transition-all duration-200`}
+                        data-testid="button-verify-phone"
+                      >
+                        {otpSending ? (
+                          <i className="fas fa-spinner fa-spin"></i>
+                        ) : phoneVerified ? (
+                          <><i className="fas fa-check mr-1"></i> Verified</>
+                        ) : (
+                          'Verify'
+                        )}
+                      </Button>
+                    </div>
+                    {registerForm.formState.errors.phone && (
+                      <p className="text-sm text-red-500">{registerForm.formState.errors.phone.message}</p>
+                    )}
+                    {phoneVerified && (
+                      <p className="text-sm text-green-600 flex items-center">
+                        <i className="fas fa-check mr-1 text-xs"></i>
+                        Phone number verified successfully
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
                     <Label htmlFor="register-password" className="text-sm font-medium text-slate-700 flex items-center">
                       <i className="fas fa-lock mr-2 text-slate-400 text-xs"></i>
                       {t("password")} *
@@ -469,6 +626,74 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
           </div>
         </div>
       </DialogContent>
+
+      {/* OTP Verification Modal */}
+      <Dialog open={otpModalOpen} onOpenChange={setOtpModalOpen}>
+        <DialogContent className="w-full max-w-md bg-white rounded-xl p-6">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-slate-900">Verify Your Phone</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <p className="text-sm text-slate-600">
+              We've sent a 4-digit verification code to <strong>{currentPhone}</strong>
+            </p>
+            <div className="space-y-2">
+              <Label htmlFor="otp-code" className="text-sm font-medium text-slate-700">
+                Enter Verification Code
+              </Label>
+              <Input
+                id="otp-code"
+                type="text"
+                maxLength={4}
+                placeholder="0000"
+                className="h-12 text-center text-2xl tracking-widest font-bold border-slate-200 focus:border-blue-500 focus:ring-blue-500/20 rounded-lg"
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                data-testid="input-otp-code"
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                onClick={() => {
+                  setOtpModalOpen(false);
+                  setOtpCode("");
+                }}
+                variant="outline"
+                className="flex-1 h-11"
+                data-testid="button-cancel-otp"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                onClick={handleVerifyOTP}
+                disabled={otpVerifying || otpCode.length !== 4}
+                className="flex-1 h-11 bg-blue-600 hover:bg-blue-700 text-white"
+                data-testid="button-submit-otp"
+              >
+                {otpVerifying ? (
+                  <><i className="fas fa-spinner fa-spin mr-2"></i> Verifying...</>
+                ) : (
+                  'Verify'
+                )}
+              </Button>
+            </div>
+            <div className="text-center">
+              <Button
+                type="button"
+                variant="link"
+                onClick={handleSendOTP}
+                disabled={otpSending}
+                className="text-sm text-blue-600 hover:text-blue-700"
+                data-testid="button-resend-otp"
+              >
+                {otpSending ? 'Sending...' : 'Resend Code'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }

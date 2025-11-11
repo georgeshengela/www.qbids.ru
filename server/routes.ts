@@ -8,6 +8,7 @@ import { storage } from "./storage";
 import { auctionService } from "./services/auction-service";
 import { timerService } from "./services/timer-service";
 import { botService } from "./services/bot-service";
+import { smsService } from "./services/sms-service";
 import { setSocketIO } from "./socket";
 import { insertUserSchema, insertAuctionSchema, insertBotSchema, insertSettingsSchema } from "@shared/schema";
 import { z } from "zod";
@@ -498,7 +499,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/validate-phone", async (req, res) => {
     try {
       const { phone } = z.object({
-        phone: z.string().regex(/^\+996\d{9}$/, "Номер должен быть в формате +996XXXXXXXXX"),
+        phone: z.string().regex(/^\+995\d{9}$/, "Номер должен быть в формате +995XXXXXXXXX"),
       }).parse(req.body);
 
       const existingUser = await storage.getUserByPhone(phone);
@@ -515,6 +516,116 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/auth/send-otp", async (req, res) => {
+    try {
+      const { phone } = z.object({
+        phone: z.string().regex(/^\+995\d{9}$/, "Phone number must be in format +995XXXXXXXXX"),
+      }).parse(req.body);
+
+      if (!smsService.validatePhoneNumber(phone)) {
+        return res.status(400).json({ error: "Invalid Georgian phone number" });
+      }
+
+      const existingUser = await storage.getUserByPhone(phone);
+      if (existingUser) {
+        return res.status(400).json({ error: "Phone number already registered" });
+      }
+
+      const otpCode = smsService.generateOTP();
+      const otpExpiresAt = new Date();
+      otpExpiresAt.setMinutes(otpExpiresAt.getMinutes() + 10);
+
+      const smsSent = await smsService.sendOTP(phone, otpCode);
+      
+      if (!smsSent) {
+        return res.status(500).json({ error: "Failed to send OTP. Please try again." });
+      }
+
+      (req.session as any).pendingOTP = {
+        phone,
+        code: otpCode,
+        expiresAt: otpExpiresAt.toISOString(),
+      };
+
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
+
+      res.json({ 
+        success: true, 
+        message: "OTP sent successfully",
+        expiresAt: otpExpiresAt.toISOString(),
+      });
+    } catch (error: any) {
+      console.error("Send OTP error:", error);
+      if (error.errors) {
+        return res.status(400).json({ error: error.errors[0].message });
+      }
+      res.status(500).json({ error: "Failed to send OTP" });
+    }
+  });
+
+  app.post("/api/auth/verify-otp", async (req, res) => {
+    try {
+      const { phone, code } = z.object({
+        phone: z.string().regex(/^\+995\d{9}$/, "Phone number must be in format +995XXXXXXXXX"),
+        code: z.string().length(4, "OTP code must be 4 digits"),
+      }).parse(req.body);
+
+      const pendingOTP = (req.session as any).pendingOTP;
+      
+      if (!pendingOTP) {
+        return res.status(400).json({ error: "No OTP request found. Please request a new OTP." });
+      }
+
+      if (pendingOTP.phone !== phone) {
+        return res.status(400).json({ error: "Phone number does not match OTP request." });
+      }
+
+      if (new Date() > new Date(pendingOTP.expiresAt)) {
+        delete (req.session as any).pendingOTP;
+        await new Promise<void>((resolve) => {
+          req.session.save(() => resolve());
+        });
+        return res.status(400).json({ error: "OTP has expired. Please request a new one." });
+      }
+
+      if (pendingOTP.code !== code) {
+        return res.status(400).json({ error: "Invalid OTP code." });
+      }
+
+      // Clear pending OTP and set verified phone
+      delete (req.session as any).pendingOTP;
+      (req.session as any).verifiedPhone = phone;
+
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
+
+      res.json({ 
+        success: true, 
+        message: "Phone number verified successfully",
+      });
+    } catch (error: any) {
+      console.error("Verify OTP error:", error);
+      // Clear pending OTP on error
+      delete (req.session as any).pendingOTP;
+      await new Promise<void>((resolve) => {
+        req.session.save(() => resolve());
+      });
+      if (error.errors) {
+        return res.status(400).json({ error: error.errors[0].message });
+      }
+      res.status(500).json({ error: "Failed to verify OTP" });
+    }
+  });
+
   app.post("/api/auth/register", async (req, res) => {
     try {
       const registerData = z.object({
@@ -522,7 +633,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lastName: z.string().optional(),
         username: z.string().min(3, "Имя пользователя должно содержать минимум 3 символа"),
         email: z.string().email("Неверный формат email"),
-        phone: z.string().regex(/^\+996\d{9}$/, "Номер должен быть в формате +996XXXXXXXXX").optional(),
+        phone: z.string().regex(/^\+995\d{9}$/, "Номер должен быть в формате +995XXXXXXXXX").optional(),
         password: z.string().min(6, "Пароль должен содержать минимум 6 символов"),
         dateOfBirth: z.string().optional(),
         gender: z.enum(["male", "female", "other"]).optional(),
@@ -539,8 +650,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Email уже зарегистрирован" });
       }
 
-      // Check phone if provided
+      // Check phone if provided and verify OTP was completed
       if (registerData.phone) {
+        const verifiedPhone = (req.session as any).verifiedPhone;
+        if (!verifiedPhone || verifiedPhone !== registerData.phone) {
+          return res.status(400).json({ error: "Phone number must be verified with OTP before registration" });
+        }
+
         const existingPhone = await storage.getUserByPhone(registerData.phone);
         if (existingPhone) {
           return res.status(400).json({ error: "Номер телефона уже зарегистрирован" });
@@ -576,7 +692,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         bidBalance: 5, // Starting bid balance
         role: "user",
         ipAddress: ipAddress,
+        isPhoneVerified: registerData.phone ? true : false,
       });
+
+      // Clear verified phone from session after successful registration
+      delete (req.session as any).verifiedPhone;
 
       req.session.userId = user.id;
       req.session.userRole = user.role;
@@ -629,6 +749,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("Registration error:", error);
+      // Clear session data on registration error
+      delete (req.session as any).verifiedPhone;
+      delete (req.session as any).pendingOTP;
       if (error.errors) {
         return res.status(400).json({ error: error.errors[0].message });
       }
