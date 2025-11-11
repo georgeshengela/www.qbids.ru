@@ -631,15 +631,15 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
       <Dialog open={otpModalOpen} onOpenChange={setOtpModalOpen}>
         <DialogContent className="w-full max-w-md bg-white rounded-xl p-6">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-slate-900">Verify Your Phone</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-slate-900">{t('verifyYourPhone')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <p className="text-sm text-slate-600">
-              We've sent a 4-digit verification code to <strong>{currentPhone}</strong>
+              {t('sentVerificationCode')} <strong>{currentPhone}</strong>
             </p>
             <div className="space-y-2">
               <Label htmlFor="otp-code" className="text-sm font-medium text-slate-700">
-                Enter Verification Code
+                {t('enterVerificationCode')}
               </Label>
               <Input
                 id="otp-code"
@@ -663,7 +663,7 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
                 className="flex-1 h-11"
                 data-testid="button-cancel-otp"
               >
-                Cancel
+                {t('cancel')}
               </Button>
               <Button
                 type="button"
@@ -688,7 +688,7 @@ export function AuthModal({ isOpen, onClose, onLoginSuccess }: AuthModalProps) {
                 className="text-sm text-blue-600 hover:text-blue-700"
                 data-testid="button-resend-otp"
               >
-                {otpSending ? 'Sending...' : 'Resend Code'}
+                {otpSending ? t('sending') : t('resendCode')}
               </Button>
             </div>
           </div>
