@@ -1,5 +1,5 @@
 import { 
-  users, auctions, bids, prebids, botSettings, bots, auctionBots, settings, transactions,
+  users, auctions, bids, prebids, botSettings, bots, auctionBots, settings, transactions, refreshTokens,
   type User, type InsertUser, 
   type Auction, type InsertAuction,
   type Bid, type InsertBid,
@@ -8,7 +8,8 @@ import {
   type Bot, type InsertBot,
   type AuctionBot, type InsertAuctionBot,
   type Settings, type InsertSettings,
-  type Transaction, type InsertTransaction
+  type Transaction, type InsertTransaction,
+  type RefreshToken, type InsertRefreshToken
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql } from "drizzle-orm";
@@ -114,6 +115,14 @@ export interface IStorage {
   updateTransaction(id: string, data: Partial<InsertTransaction>): Promise<Transaction>;
   getUserTransactions(userId: string, limit?: number): Promise<Transaction[]>;
   addBidsToUser(userId: string, bidsAmount: number): Promise<void>;
+  
+  // Refresh token methods
+  createRefreshToken(token: InsertRefreshToken): Promise<RefreshToken>;
+  getRefreshTokenByHash(tokenHash: string): Promise<RefreshToken | undefined>;
+  getUserRefreshTokens(userId: string): Promise<RefreshToken[]>;
+  revokeRefreshToken(id: string, reason?: string, replacedByTokenId?: string): Promise<void>;
+  revokeAllUserRefreshTokens(userId: string, reason?: string): Promise<void>;
+  cleanupExpiredRefreshTokens(): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -944,6 +953,53 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({ bidBalance: sql`${users.bidBalance} + ${bidsAmount}` })
       .where(eq(users.id, userId));
+  }
+
+  // Refresh token methods
+  async createRefreshToken(token: InsertRefreshToken): Promise<RefreshToken> {
+    const [newToken] = await db.insert(refreshTokens).values(token).returning();
+    return newToken;
+  }
+
+  async getRefreshTokenByHash(tokenHash: string): Promise<RefreshToken | undefined> {
+    const [token] = await db.select().from(refreshTokens).where(eq(refreshTokens.tokenHash, tokenHash));
+    return token || undefined;
+  }
+
+  async getUserRefreshTokens(userId: string): Promise<RefreshToken[]> {
+    return await db
+      .select()
+      .from(refreshTokens)
+      .where(eq(refreshTokens.userId, userId))
+      .orderBy(desc(refreshTokens.issuedAt));
+  }
+
+  async revokeRefreshToken(id: string, reason?: string, replacedByTokenId?: string): Promise<void> {
+    await db
+      .update(refreshTokens)
+      .set({ 
+        revokedAt: new Date(),
+        revokedReason: reason || null,
+        replacedByTokenId: replacedByTokenId || null
+      })
+      .where(eq(refreshTokens.id, id));
+  }
+
+  async revokeAllUserRefreshTokens(userId: string, reason?: string): Promise<void> {
+    await db
+      .update(refreshTokens)
+      .set({ 
+        revokedAt: new Date(),
+        revokedReason: reason || null
+      })
+      .where(eq(refreshTokens.userId, userId));
+  }
+
+  async cleanupExpiredRefreshTokens(): Promise<void> {
+    // Delete tokens that have expired
+    await db
+      .delete(refreshTokens)
+      .where(sql`${refreshTokens.expiresAt} < ${new Date()}`);
   }
 }
 

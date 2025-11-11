@@ -1,8 +1,26 @@
 import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 import { type Request, type Response, type NextFunction } from "express";
 
-const JWT_SECRET = process.env.JWT_SECRET || "fallback-jwt-secret-dev-only";
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || "fallback-refresh-secret-dev-only";
+// Validate that secrets are present in production
+if (process.env.NODE_ENV === "production") {
+  if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
+    throw new Error("JWT_SECRET and JWT_REFRESH_SECRET must be set in production");
+  }
+}
+
+// Use fallback only in development for convenience
+const JWT_SECRET = process.env.JWT_SECRET || (
+  process.env.NODE_ENV === "development" 
+    ? "dev-only-jwt-secret-change-in-production" 
+    : (() => { throw new Error("JWT_SECRET not configured"); })()
+);
+
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || (
+  process.env.NODE_ENV === "development" 
+    ? "dev-only-refresh-secret-change-in-production" 
+    : (() => { throw new Error("JWT_REFRESH_SECRET not configured"); })()
+);
 
 // Token expiration times
 const ACCESS_TOKEN_EXPIRY = "1h"; // 1 hour
@@ -58,6 +76,21 @@ export function verifyRefreshToken(token: string): RefreshTokenPayload | null {
   } catch (error) {
     return null;
   }
+}
+
+/**
+ * Hash refresh token for secure storage
+ */
+export async function hashRefreshToken(token: string): Promise<string> {
+  // Use bcrypt with cost factor 12 for strong hashing
+  return await bcrypt.hash(token, 12);
+}
+
+/**
+ * Verify refresh token against stored hash
+ */
+export async function verifyRefreshTokenHash(token: string, hash: string): Promise<boolean> {
+  return await bcrypt.compare(token, hash);
 }
 
 /**

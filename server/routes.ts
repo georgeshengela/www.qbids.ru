@@ -11,7 +11,7 @@ import { botService } from "./services/bot-service";
 import { setSocketIO } from "./socket";
 import { insertUserSchema, insertAuctionSchema, insertBotSchema, insertSettingsSchema } from "@shared/schema";
 import { z } from "zod";
-import { generateAccessToken, generateRefreshToken, verifyRefreshToken, authenticateJWT } from "./jwt";
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken, authenticateJWT, hashRefreshToken, verifyRefreshTokenHash } from "./jwt";
 
 // Multilingual error messages
 const errorMessages = {
@@ -92,7 +92,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create payment session before redirecting to Digiseller
-  app.post("/api/payment/create-session", async (req, res) => {
+  app.post("/api/payment/create-session", authenticateJWT, async (req, res) => {
     if (!req.session.userId) {
       return res.status(401).json({ error: "Не авторизован" });
     }
@@ -404,7 +404,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Manual balance refresh endpoint (for testing/support)
-  app.post("/api/payment/refresh-balance", async (req, res) => {
+  app.post("/api/payment/refresh-balance", authenticateJWT, async (req, res) => {
     if (!req.session.userId) {
       return res.status(401).json({ error: "Не авторизован" });
     }
@@ -591,6 +591,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId: user.id,
       });
 
+      // Store refresh token hash in database
+      const tokenHash = await hashRefreshToken(refreshToken);
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 30); // 30 days from now
+
+      await storage.createRefreshToken({
+        userId: user.id,
+        tokenHash,
+        expiresAt,
+      });
+
       // Explicitly save the session before responding
       req.session.save((err) => {
         if (err) {
@@ -654,6 +665,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         userId: user.id,
       });
 
+      // Store refresh token hash in database
+      const tokenHash = await hashRefreshToken(refreshToken);
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 30); // 30 days from now
+
+      await storage.createRefreshToken({
+        userId: user.id,
+        tokenHash,
+        expiresAt,
+      });
+
       // Explicitly save the session before responding
       req.session.save((err) => {
         if (err) {
@@ -686,22 +708,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auth/logout", (req, res) => {
+  app.post("/api/auth/logout", authenticateJWT, async (req, res) => {
+    if (req.session.userId) {
+      // Revoke all refresh tokens for this user
+      await storage.revokeAllUserRefreshTokens(req.session.userId, "User logged out");
+    }
+    
     req.session.destroy(() => {
       res.json({ success: true });
     });
   });
 
-  // JWT Token Refresh Endpoint
+  // JWT Token Refresh Endpoint with rotation and revocation
   app.post("/api/auth/refresh", async (req, res) => {
     try {
       const { refreshToken } = z.object({
         refreshToken: z.string(),
       }).parse(req.body);
 
+      // Verify JWT signature and expiration
       const payload = verifyRefreshToken(refreshToken);
       if (!payload) {
         return res.status(401).json({ error: "Invalid or expired refresh token" });
+      }
+
+      // Get all non-revoked tokens for this user and find matching one
+      const userTokens = await storage.getUserRefreshTokens(payload.userId);
+      
+      let storedToken = null;
+      for (const token of userTokens) {
+        // Skip revoked tokens
+        if (token.revokedAt) continue;
+        
+        // Check if token has expired
+        if (new Date() > new Date(token.expiresAt)) continue;
+        
+        // Verify token hash using bcrypt
+        const isMatch = await verifyRefreshTokenHash(refreshToken, token.tokenHash);
+        if (isMatch) {
+          storedToken = token;
+          break;
+        }
+      }
+
+      if (!storedToken) {
+        return res.status(401).json({ error: "Refresh token not found or has been revoked" });
       }
 
       // Get user to generate new tokens
@@ -710,16 +761,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: getErrorMessage(req, 'userNotFound') });
       }
 
-      // Generate new access token
+      // Generate new access and refresh tokens
       const newAccessToken = generateAccessToken({
         userId: user.id,
         username: user.username,
         role: user.role,
       });
 
-      // Optionally generate new refresh token (token rotation for security)
       const newRefreshToken = generateRefreshToken({
         userId: user.id,
+      });
+
+      // Hash and store new refresh token
+      const newTokenHash = await hashRefreshToken(newRefreshToken);
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 30); // 30 days from now
+
+      const newStoredToken = await storage.createRefreshToken({
+        userId: user.id,
+        tokenHash: newTokenHash,
+        expiresAt,
+      });
+
+      // Revoke old refresh token with rotation info
+      await storage.revokeRefreshToken(
+        storedToken.id,
+        "Token rotated",
+        newStoredToken.id
+      );
+
+      // Opportunistic cleanup of expired tokens
+      await storage.cleanupExpiredRefreshTokens().catch(() => {
+        // Log but don't fail the request if cleanup fails
+        console.error("Failed to cleanup expired tokens");
       });
 
       res.json({
@@ -735,7 +809,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/auth/me", async (req, res) => {
+  app.get("/api/auth/me", authenticateJWT, async (req, res) => {
     console.log("Session ID:", req.sessionID);
     console.log("Session data:", req.session);
     console.log("User ID from session:", req.session.userId);
@@ -859,7 +933,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/auctions/:id/bid", async (req, res) => {
+  app.post("/api/auctions/:id/bid", authenticateJWT, async (req, res) => {
     if (!req.session.userId) {
       return res.status(401).json({ error: "Не авторизован" });
     }
@@ -880,7 +954,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ success: true });
   });
 
-  app.post("/api/auctions/:id/prebid", async (req, res) => {
+  app.post("/api/auctions/:id/prebid", authenticateJWT, async (req, res) => {
     if (!req.session.userId) {
       return res.status(401).json({ error: "Не авторизован" });
     }
@@ -900,7 +974,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(bids);
   });
 
-  app.get("/api/bids/user", async (req, res) => {
+  app.get("/api/bids/user", authenticateJWT, async (req, res) => {
     if (!req.session.userId) {
       return res.status(401).json({ error: "Не авторизован" });
     }
@@ -909,7 +983,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(bids);
   });
 
-  app.get("/api/prebids/user", async (req, res) => {
+  app.get("/api/prebids/user", authenticateJWT, async (req, res) => {
     if (!req.session.userId) {
       return res.status(401).json({ error: "Не авторизован" });
     }
@@ -1007,7 +1081,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User stats
-  app.get("/api/users/stats", async (req, res) => {
+  app.get("/api/users/stats", authenticateJWT, async (req, res) => {
     if (!req.session.userId) {
       return res.status(401).json({ error: "Не авторизован" });
     }
@@ -1066,7 +1140,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User won auctions
-  app.get("/api/users/won-auctions", async (req, res) => {
+  app.get("/api/users/won-auctions", authenticateJWT, async (req, res) => {
     if (!req.session.userId) {
       return res.status(401).json({ error: "Не авторизован" });
     }
@@ -1076,7 +1150,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User recent bids
-  app.get("/api/users/recent-bids", async (req, res) => {
+  app.get("/api/users/recent-bids", authenticateJWT, async (req, res) => {
     if (!req.session.userId) {
       return res.status(401).json({ error: "Не авторизован" });
     }
