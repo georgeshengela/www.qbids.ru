@@ -627,7 +627,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (registerData.phone) {
         // MOBILE FLOW: Check verificationId in database (stateless)
         if (registerData.verificationId) {
-          const otpVerification = await storage.getOtpVerification(registerData.verificationId);
+          const otpVerification = await storage.getOtpVerificationById(registerData.verificationId);
           
           if (!otpVerification) {
             return res.status(400).json({ error: "Invalid or expired verification ID" });
@@ -769,11 +769,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error: any) {
       console.error("Registration error:", error);
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
       // Clear session data on registration error
       delete (req.session as any).verifiedPhone;
       delete (req.session as any).pendingOTP;
       if (error.errors) {
         return res.status(400).json({ error: error.errors[0].message });
+      }
+      // Return actual error in development for debugging
+      if (process.env.NODE_ENV === 'development') {
+        return res.status(400).json({ error: error.message || getErrorMessage(req, 'registrationError') });
       }
       res.status(400).json({ error: getErrorMessage(req, 'registrationError') });
     }

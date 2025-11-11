@@ -133,6 +133,7 @@ export interface IStorage {
   incrementOtpAttempt(id: string): Promise<void>;
   deleteExpiredOtpVerifications(): Promise<void>;
   deleteOtpVerificationsByPhone(phone: string, purpose: string): Promise<void>;
+  deleteOtpVerification(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1082,6 +1083,12 @@ export class DatabaseStorage implements IStorage {
           eq(otpVerifications.purpose, purpose)
         )
       );
+  }
+
+  async deleteOtpVerification(id: string): Promise<void> {
+    await db
+      .delete(otpVerifications)
+      .where(eq(otpVerifications.id, id));
   }
 }
 
