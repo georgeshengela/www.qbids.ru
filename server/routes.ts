@@ -479,40 +479,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/validate-email", async (req, res) => {
     try {
       const { email } = z.object({
-        email: z.string().email("Неверный формат email"),
+        email: z.string().email(getErrorMessage(req, 'invalidEmailFormat')),
       }).parse(req.body);
 
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
-        return res.json({ valid: false, message: "Email уже зарегистрирован" });
+        return res.json({ valid: false, message: getErrorMessage(req, 'emailAlreadyRegistered') });
       }
 
-      res.json({ valid: true, message: "Email доступен" });
+      res.json({ valid: true, message: getErrorMessage(req, 'emailAvailable') });
     } catch (error: any) {
       if (error.errors) {
         return res.json({ valid: false, message: error.errors[0].message });
       }
-      res.json({ valid: false, message: "Неверный формат email" });
+      res.json({ valid: false, message: getErrorMessage(req, 'invalidEmailFormat') });
     }
   });
 
   app.post("/api/auth/validate-phone", async (req, res) => {
     try {
       const { phone } = z.object({
-        phone: z.string().regex(/^\+995\d{9}$/, "Номер должен быть в формате +995XXXXXXXXX"),
+        phone: z.string().regex(/^\+995\d{9}$/, "Phone number must be in format +995XXXXXXXXX"),
       }).parse(req.body);
 
       const existingUser = await storage.getUserByPhone(phone);
       if (existingUser) {
-        return res.json({ valid: false, message: "Номер телефона уже зарегистрирован" });
+        return res.json({ valid: false, message: getErrorMessage(req, 'phoneAlreadyRegistered') });
       }
 
-      res.json({ valid: true, message: "Номер телефона доступен" });
+      res.json({ valid: true, message: getErrorMessage(req, 'phoneAvailable') });
     } catch (error: any) {
       if (error.errors) {
         return res.json({ valid: false, message: error.errors[0].message });
       }
-      res.json({ valid: false, message: "Неверный формат номера" });
+      res.json({ valid: false, message: getErrorMessage(req, 'invalidEmailFormat') });
     }
   });
 
@@ -631,10 +631,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const registerData = z.object({
         firstName: z.string().optional(),
         lastName: z.string().optional(),
-        username: z.string().min(3, "Имя пользователя должно содержать минимум 3 символа"),
-        email: z.string().email("Неверный формат email"),
-        phone: z.string().regex(/^\+995\d{9}$/, "Номер должен быть в формате +995XXXXXXXXX").optional(),
-        password: z.string().min(6, "Пароль должен содержать минимум 6 символов"),
+        username: z.string().min(3, "Username must contain at least 3 characters"),
+        email: z.string().email(getErrorMessage(req, 'invalidEmailFormat')),
+        phone: z.string().regex(/^\+995\d{9}$/, "Phone number must be in format +995XXXXXXXXX").optional(),
+        password: z.string().min(6, "Password must contain at least 6 characters"),
         dateOfBirth: z.string().optional(),
         gender: z.enum(["male", "female", "other"]).optional(),
       }).parse(req.body);
@@ -647,7 +647,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const existingEmail = await storage.getUserByEmail(registerData.email);
       if (existingEmail) {
-        return res.status(400).json({ error: "Email уже зарегистрирован" });
+        return res.status(400).json({ error: getErrorMessage(req, 'emailAlreadyRegistered') });
       }
 
       // Check phone if provided and verify OTP was completed
@@ -659,7 +659,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         const existingPhone = await storage.getUserByPhone(registerData.phone);
         if (existingPhone) {
-          return res.status(400).json({ error: "Номер телефона уже зарегистрирован" });
+          return res.status(400).json({ error: getErrorMessage(req, 'phoneAlreadyRegistered') });
         }
       }
 
