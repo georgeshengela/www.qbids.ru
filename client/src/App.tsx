@@ -3,7 +3,6 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useAuth } from "@/hooks/use-auth";
 import Home from "@/pages/home";
 import Auctions from "@/pages/auctions";
 import Admin from "@/pages/admin";
@@ -31,16 +30,13 @@ import { useAnalytics } from "@/hooks/use-analytics";
 import { useEffect, useState } from "react";
 import { initGA } from "./lib/analytics";
 import { WelcomeModal } from "@/components/welcome-modal";
-import { CompleteProfileModal } from "@/components/complete-profile-modal";
 import { CookieBanner } from "@/components/cookie-banner";
 import { useSettings } from "@/hooks/use-settings";
 
 function Router() {
   // Track page views when routes change
   useAnalytics();
-  const { user } = useAuth();
   const { settings } = useSettings();
-  const [showCompleteProfileModal, setShowCompleteProfileModal] = useState(false);
 
   // Apply language attribute to body for font styling
   useEffect(() => {
@@ -48,20 +44,6 @@ function Router() {
       document.body.setAttribute('data-language', settings.language);
     }
   }, [settings?.language]);
-
-  // Check for complete profile modal flag after login/registration
-  useEffect(() => {
-    const shouldShowModal = localStorage.getItem('showCompleteProfileModal');
-    console.log('Checking complete profile modal flag:', shouldShowModal, 'User:', user?.username);
-    if (shouldShowModal && user) {
-      console.log('Showing complete profile modal for user:', user.username);
-      setShowCompleteProfileModal(true);
-      localStorage.removeItem('showCompleteProfileModal');
-    }
-  }, [user]);
-
-  // Debug log
-  console.log('Complete profile modal state:', showCompleteProfileModal);
 
   return (
     <>
@@ -90,13 +72,6 @@ function Router() {
         <Route component={NotFound} />
       </Switch>
       <Footer />
-      
-      {/* Complete Profile Modal */}
-      <CompleteProfileModal 
-        isOpen={showCompleteProfileModal} 
-        onClose={() => setShowCompleteProfileModal(false)}
-        onComplete={() => setShowCompleteProfileModal(false)}
-      />
       
       {/* Cookie Banner for first-time visitors */}
       <CookieBanner />

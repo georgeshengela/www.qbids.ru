@@ -86,9 +86,6 @@ export function useAuth() {
     onSuccess: (data) => {
       globalUser = data.user;
       setUser(data.user);
-      // Set flag in localStorage to show complete profile modal
-      localStorage.setItem('showCompleteProfileModal', 'true');
-      console.log('Registration success - setting localStorage flag for profile completion');
       // Invalidate all queries to refresh data after registration
       queryClient.invalidateQueries();
     },
