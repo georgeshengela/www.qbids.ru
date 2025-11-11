@@ -21,6 +21,9 @@ export const users = pgTable("users", {
   bidBalance: integer("bid_balance").notNull().default(0), // Changed from money balance to bid count
   role: userRoleEnum("role").notNull().default("user"),
   ipAddress: text("ip_address"),
+  otpCode: text("otp_code"),
+  otpExpiresAt: timestamp("otp_expires_at"),
+  isPhoneVerified: boolean("is_phone_verified").notNull().default(false),
 
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
