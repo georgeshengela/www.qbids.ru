@@ -136,6 +136,22 @@ export const refreshTokens = pgTable("refresh_tokens", {
   revokedReason: text("revoked_reason"),
 });
 
+// OTP verifications table for stateless phone verification (works for both web and mobile)
+export const otpVerifications = pgTable("otp_verifications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  phone: text("phone").notNull(),
+  otpHash: text("otp_hash").notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  consumedAt: timestamp("consumed_at"),
+  attemptCount: integer("attempt_count").notNull().default(0),
+  purpose: text("purpose").notNull().default("registration"),
+  ipAddress: text("ip_address"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => [
+  index("idx_otp_phone_purpose").on(table.phone, table.purpose),
+  index("idx_otp_expires_at").on(table.expiresAt),
+]);
+
 // Session storage table for express-session
 export const sessions = pgTable(
   "sessions",
@@ -267,6 +283,12 @@ export const insertRefreshTokenSchema = createInsertSchema(refreshTokens).omit({
   issuedAt: true,
 });
 
+export const insertOtpVerificationSchema = createInsertSchema(otpVerifications).omit({
+  id: true,
+  createdAt: true,
+  consumedAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -288,3 +310,5 @@ export type Transaction = typeof transactions.$inferSelect;
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
 export type RefreshToken = typeof refreshTokens.$inferSelect;
 export type InsertRefreshToken = z.infer<typeof insertRefreshTokenSchema>;
+export type OtpVerification = typeof otpVerifications.$inferSelect;
+export type InsertOtpVerification = z.infer<typeof insertOtpVerificationSchema>;

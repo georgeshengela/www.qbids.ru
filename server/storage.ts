@@ -1,5 +1,5 @@
 import { 
-  users, auctions, bids, prebids, botSettings, bots, auctionBots, settings, transactions, refreshTokens,
+  users, auctions, bids, prebids, botSettings, bots, auctionBots, settings, transactions, refreshTokens, otpVerifications,
   type User, type InsertUser, 
   type Auction, type InsertAuction,
   type Bid, type InsertBid,
@@ -9,7 +9,8 @@ import {
   type AuctionBot, type InsertAuctionBot,
   type Settings, type InsertSettings,
   type Transaction, type InsertTransaction,
-  type RefreshToken, type InsertRefreshToken
+  type RefreshToken, type InsertRefreshToken,
+  type OtpVerification, type InsertOtpVerification
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql } from "drizzle-orm";
@@ -123,6 +124,15 @@ export interface IStorage {
   revokeRefreshToken(id: string, reason?: string, replacedByTokenId?: string): Promise<void>;
   revokeAllUserRefreshTokens(userId: string, reason?: string): Promise<void>;
   cleanupExpiredRefreshTokens(): Promise<void>;
+  
+  // OTP verification methods
+  createOtpVerification(otp: InsertOtpVerification): Promise<OtpVerification>;
+  getOtpVerificationById(id: string): Promise<OtpVerification | undefined>;
+  getActiveOtpVerificationByPhone(phone: string, purpose: string): Promise<OtpVerification | undefined>;
+  consumeOtpVerification(id: string): Promise<void>;
+  incrementOtpAttempt(id: string): Promise<void>;
+  deleteExpiredOtpVerifications(): Promise<void>;
+  deleteOtpVerificationsByPhone(phone: string, purpose: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1000,6 +1010,68 @@ export class DatabaseStorage implements IStorage {
     await db
       .delete(refreshTokens)
       .where(sql`${refreshTokens.expiresAt} < ${new Date()}`);
+  }
+
+  // OTP Verification methods
+  async createOtpVerification(otp: InsertOtpVerification): Promise<OtpVerification> {
+    const [otpVerification] = await db.insert(otpVerifications).values(otp).returning();
+    return otpVerification;
+  }
+
+  async getOtpVerificationById(id: string): Promise<OtpVerification | undefined> {
+    const [otp] = await db
+      .select()
+      .from(otpVerifications)
+      .where(eq(otpVerifications.id, id));
+    return otp || undefined;
+  }
+
+  async getActiveOtpVerificationByPhone(phone: string, purpose: string): Promise<OtpVerification | undefined> {
+    const [otp] = await db
+      .select()
+      .from(otpVerifications)
+      .where(
+        and(
+          eq(otpVerifications.phone, phone),
+          eq(otpVerifications.purpose, purpose),
+          sql`${otpVerifications.consumedAt} IS NULL`,
+          sql`${otpVerifications.expiresAt} > ${new Date()}`
+        )
+      )
+      .orderBy(desc(otpVerifications.createdAt))
+      .limit(1);
+    return otp || undefined;
+  }
+
+  async consumeOtpVerification(id: string): Promise<void> {
+    await db
+      .update(otpVerifications)
+      .set({ consumedAt: new Date() })
+      .where(eq(otpVerifications.id, id));
+  }
+
+  async incrementOtpAttempt(id: string): Promise<void> {
+    await db
+      .update(otpVerifications)
+      .set({ attemptCount: sql`${otpVerifications.attemptCount} + 1` })
+      .where(eq(otpVerifications.id, id));
+  }
+
+  async deleteExpiredOtpVerifications(): Promise<void> {
+    await db
+      .delete(otpVerifications)
+      .where(sql`${otpVerifications.expiresAt} < ${new Date()}`);
+  }
+
+  async deleteOtpVerificationsByPhone(phone: string, purpose: string): Promise<void> {
+    await db
+      .delete(otpVerifications)
+      .where(
+        and(
+          eq(otpVerifications.phone, phone),
+          eq(otpVerifications.purpose, purpose)
+        )
+      );
   }
 }
 
