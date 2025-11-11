@@ -10,6 +10,7 @@ import Admin from "@/pages/admin";
 import AdminUsers from "@/pages/admin-users";
 import AdminFinishedAuctions from "@/pages/admin-finished-auctions";
 import AdminSettings from "@/pages/admin-settings";
+import AdminApiDocs from "@/pages/admin-api-docs";
 import Login from "@/pages/login";
 import AuctionDetail from "@/pages/auction-detail";
 import BidHistory from "@/pages/bid-history";
@@ -72,6 +73,7 @@ function Router() {
         <Route path="/admin/users" component={AdminUsers} />
         <Route path="/admin/finished-auctions" component={AdminFinishedAuctions} />
         <Route path="/admin/settings" component={AdminSettings} />
+        <Route path="/admin/api-docs" component={AdminApiDocs} />
         <Route path="/login" component={Login} />
         <Route path="/auction/:slug" component={AuctionDetail} />
         <Route path="/bid-history" component={BidHistory} />
