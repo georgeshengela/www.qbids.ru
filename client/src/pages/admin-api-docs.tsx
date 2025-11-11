@@ -302,6 +302,62 @@ Content-Type: application/json`}
           />
 
           <EndpointCard
+            method="POST"
+            endpoint="/api/auth/validate-phone"
+            title="Проверка телефона"
+            description="Проверить доступность номера телефона"
+            headers={{
+              "Content-Type": "application/json"
+            }}
+            requestBody={{
+              phone: "+995593090000"
+            }}
+            responseExample={{
+              valid: true,
+              message: "Phone number is available"
+            }}
+          />
+
+          <EndpointCard
+            method="POST"
+            endpoint="/api/auth/send-otp"
+            title="Отправить OTP код"
+            description="Отправить 4-значный OTP код верификации на указанный номер телефона через SMS (SMSOffice). Код действителен 10 минут. Для мобильных приложений - используйте этот метод для верификации телефона перед регистрацией."
+            headers={{
+              "Content-Type": "application/json",
+              "Accept-Language": "ka | ru | en"
+            }}
+            requestBody={{
+              phone: "+995593090000"
+            }}
+            responseExample={{
+              success: true,
+              message: "OTP code sent successfully",
+              expiresIn: 600
+            }}
+          />
+
+          <EndpointCard
+            method="POST"
+            endpoint="/api/auth/verify-otp"
+            title="Проверить OTP код"
+            description="Верифицировать 4-значный OTP код для подтверждения номера телефона. После успешной верификации телефон считается подтвержденным и может быть использован при регистрации. Для мобильных приложений - вызовите этот метод после получения OTP кода от пользователя."
+            headers={{
+              "Content-Type": "application/json",
+              "Accept-Language": "ka | ru | en"
+            }}
+            requestBody={{
+              phone: "+995593090000",
+              code: "1234"
+            }}
+            responseExample={{
+              success: true,
+              message: "Phone number verified successfully",
+              verifiedPhone: "+995593090000"
+            }}
+          />
+
+          <EndpointCard
             method="GET"
             endpoint="/api/auth/me"
             title="Получить текущего пользователя"
