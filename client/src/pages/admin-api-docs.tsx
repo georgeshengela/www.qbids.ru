@@ -579,6 +579,66 @@ Content-Type: application/json`}
               ]
             }}
           />
+
+          <EndpointCard
+            method="GET"
+            endpoint="/api/timers"
+            title="Таймеры всех аукционов (Real-Time)"
+            description="Получить детальную информацию о таймерах для всех аукционов (upcoming, live, finished). Возвращает время до старта, оставшееся время и время с момента завершения."
+            responseExample={{
+              timestamp: "2025-11-11T19:35:42.123Z",
+              auctions: [
+                {
+                  auctionId: "39e1be82-1a58-42af-a634-3",
+                  title: "iPhone 15 Pro 256GB",
+                  status: "upcoming",
+                  startTime: "2025-11-11T21:30:00.000Z",
+                  endTime: null,
+                  currentPrice: 0.20,
+                  retailPrice: 4899.00,
+                  imageUrl: "https://images.unsplash.com/photo-...",
+                  timeUntilStart: 7258,
+                  timeLeft: 0,
+                  timeSinceEnded: 0,
+                  isActive: false,
+                  hasStarted: false,
+                  hasEnded: false
+                },
+                {
+                  auctionId: "live-auction-123",
+                  title: "MacBook Air M3",
+                  status: "live",
+                  startTime: "2025-11-11T19:00:00.000Z",
+                  endTime: null,
+                  currentPrice: 45.60,
+                  retailPrice: 5499.00,
+                  imageUrl: "https://images.unsplash.com/photo-...",
+                  timeUntilStart: 0,
+                  timeLeft: 8,
+                  timeSinceEnded: 0,
+                  isActive: true,
+                  hasStarted: true,
+                  hasEnded: false
+                },
+                {
+                  auctionId: "finished-auction-456",
+                  title: "iPad Pro 12.9\"",
+                  status: "finished",
+                  startTime: "2025-11-11T10:00:00.000Z",
+                  endTime: "2025-11-11T10:15:30.000Z",
+                  currentPrice: 45.80,
+                  retailPrice: 4299.00,
+                  imageUrl: "https://images.unsplash.com/photo-...",
+                  timeUntilStart: 0,
+                  timeLeft: 0,
+                  timeSinceEnded: 33012,
+                  isActive: false,
+                  hasStarted: true,
+                  hasEnded: true
+                }
+              ]
+            }}
+          />
         </section>
 
         {/* User Profile Section */}

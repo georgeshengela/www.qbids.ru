@@ -62,6 +62,39 @@ Database schema is managed with Drizzle ORM. The schema includes:
 - `bot_settings` - Bot configuration
 
 ## Recent Changes
+- **2025-11-11**: Timer API for All Auction Types
+  - **✅ NEW FEATURE**: Created comprehensive `/api/timers` endpoint
+    - **Purpose**: Provide real-time timer details for all auctions (upcoming, live, finished)
+    - **Returns**: Array of all auctions with detailed timing information
+  
+  - **Response Fields** (per auction):
+    - `auctionId`, `title`, `status` - Basic auction info
+    - `startTime`, `endTime` - Auction schedule timestamps
+    - `currentPrice`, `retailPrice` - Price information
+    - `imageUrl` - Auction image
+    - `timeUntilStart` - Seconds until auction starts (upcoming)
+    - `timeLeft` - Seconds remaining (live auctions)
+    - `timeSinceEnded` - Seconds since ended (finished)
+    - `isActive`, `hasStarted`, `hasEnded` - Boolean status flags
+  
+  - **Mobile App Usage**:
+    ```javascript
+    // Get all auction timers
+    const response = await fetch('https://qbids.ge/api/timers');
+    const data = await response.json();
+    
+    // Filter by status
+    const upcoming = data.auctions.filter(a => a.status === 'upcoming');
+    const live = data.auctions.filter(a => a.status === 'live');
+    const finished = data.auctions.filter(a => a.status === 'finished');
+    
+    // Use timeUntilStart for countdown (upcoming auctions)
+    // Use timeLeft for countdown (live auctions)
+    // Use timeSinceEnded for "ended X ago" (finished auctions)
+    ```
+  
+  - **API Documentation**: Added to `/admin/api-docs` with complete examples
+
 - **2025-11-11**: CORS Configuration for Mobile Apps
   - **✅ CRITICAL FIX**: Added CORS middleware to allow mobile app connections
     - **Problem**: Mobile apps getting CORS errors when making API requests

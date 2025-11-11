@@ -1731,10 +1731,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Real-time timer updates
-  app.get("/api/timers", (req, res) => {
-    const timers = timerService.getAllTimers();
-    res.json(timers);
+  // Real-time timer updates with comprehensive auction details
+  app.get("/api/timers", async (req, res) => {
+    try {
+      const allAuctions = await storage.getAllAuctions();
+      const now = new Date();
+      
+      const timerDetails = allAuctions.map(auction => {
+        const startTime = new Date(auction.startTime);
+        const endTime = auction.endTime ? new Date(auction.endTime) : null;
+        
+        // Calculate different time values based on auction status
+        let timeUntilStart = 0;
+        let timeLeft = 0;
+        let timeSinceEnded = 0;
+        let status = auction.status;
+        
+        if (auction.status === 'upcoming') {
+          // Time until auction starts (in seconds)
+          timeUntilStart = Math.max(0, Math.floor((startTime.getTime() - now.getTime()) / 1000));
+        } else if (auction.status === 'live') {
+          // Time left in live auction (from timer service)
+          timeLeft = timerService.getTimeLeft(auction.id);
+        } else if (auction.status === 'finished' && endTime) {
+          // Time since auction ended (in seconds)
+          timeSinceEnded = Math.floor((now.getTime() - endTime.getTime()) / 1000);
+        }
+        
+        return {
+          auctionId: auction.id,
+          title: auction.title,
+          status: status,
+          startTime: auction.startTime,
+          endTime: auction.endTime,
+          currentPrice: parseFloat(auction.currentPrice),
+          retailPrice: parseFloat(auction.retailPrice),
+          imageUrl: auction.imageUrl,
+          timeUntilStart, // seconds until start (upcoming auctions)
+          timeLeft,        // seconds remaining (live auctions)
+          timeSinceEnded,  // seconds since ended (finished auctions)
+          isActive: auction.status === 'live',
+          hasStarted: auction.status !== 'upcoming',
+          hasEnded: auction.status === 'finished'
+        };
+      });
+      
+      res.json({
+        timestamp: now.toISOString(),
+        auctions: timerDetails
+      });
+    } catch (error) {
+      console.error("Error fetching timer details:", error);
+      res.status(500).json({ error: "Failed to fetch timer details" });
+    }
   });
 
   // Socket.IO real-time updates
