@@ -1255,6 +1255,87 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(stats);
   });
 
+  // Comprehensive user bid history API for mobile
+  app.get("/api/users/bid-history", authenticateJWT, async (req, res) => {
+    if (!req.session.userId) {
+      return res.status(401).json({ error: "Не авторизован" });
+    }
+
+    // Get user's regular bids
+    const userBids = await storage.getUserBids(req.session.userId, 100);
+    
+    // Get user's prebids
+    const userPrebids = await storage.getUserPrebids(req.session.userId, 100);
+
+    // Transform regular bids to mobile-friendly format
+    const bids = userBids.map(bid => ({
+      id: bid.id,
+      auctionId: bid.auctionId,
+      amount: bid.amount,
+      timestamp: bid.createdAt,
+      type: 'bid' as const,
+      auction: {
+        id: bid.auction.id,
+        title: bid.auction.title,
+        displayId: bid.auction.displayId,
+        status: bid.auction.status,
+        currentPrice: bid.auction.currentPrice,
+        retailPrice: bid.auction.retailPrice,
+        imageUrl: bid.auction.imageUrl,
+        startTime: bid.auction.startTime,
+        endTime: bid.auction.endTime,
+        winnerId: bid.auction.winnerId
+      }
+    }));
+
+    // Transform prebids to mobile-friendly format
+    const prebids = userPrebids.map(prebid => ({
+      id: prebid.id,
+      auctionId: prebid.auctionId,
+      timestamp: prebid.createdAt,
+      type: 'prebid' as const,
+      auction: {
+        id: prebid.auction.id,
+        title: prebid.auction.title,
+        displayId: prebid.auction.displayId,
+        status: prebid.auction.status,
+        currentPrice: prebid.auction.currentPrice,
+        retailPrice: prebid.auction.retailPrice,
+        imageUrl: prebid.auction.imageUrl,
+        startTime: prebid.auction.startTime,
+        endTime: prebid.auction.endTime,
+        winnerId: prebid.auction.winnerId
+      }
+    }));
+
+    // Categorize bids by auction status
+    const activeBids = bids.filter(b => b.auction.status === 'live');
+    const upcomingPrebids = prebids.filter(p => p.auction.status === 'upcoming');
+    const finishedBids = bids.filter(b => b.auction.status === 'finished');
+    const finishedPrebids = prebids.filter(p => p.auction.status === 'finished');
+    
+    // Combine finished bids and prebids for complete history
+    const finishedHistory = [...finishedBids, ...finishedPrebids].sort((a, b) => 
+      new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
+
+    // Return comprehensive bid history
+    res.json({
+      bids,
+      prebids,
+      activeBids,
+      upcomingPrebids,
+      finishedHistory,
+      summary: {
+        totalBids: bids.length,
+        totalPrebids: prebids.length,
+        activeBidsCount: activeBids.length,
+        upcomingPrebidsCount: upcomingPrebids.length,
+        finishedHistoryCount: finishedHistory.length
+      }
+    });
+  });
+
   // User profile
   app.get("/api/users/profile", authenticateJWT, async (req, res) => {
     if (!req.session.userId) {
