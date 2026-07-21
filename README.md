@@ -21,23 +21,25 @@ A real-time penny auction platform built for the Kyrgyzstan market with React, N
 
 ## Environment Variables
 
-Required environment variables for production:
+See `.env.example`. Required for production:
 
 ```
-DATABASE_URL=postgresql://username:password@host:port/database
+DATABASE_URL=postgresql://...neon.tech/neondb?sslmode=require
 SESSION_SECRET=your-secure-session-secret
+JWT_SECRET=your-jwt-secret
+JWT_REFRESH_SECRET=your-jwt-refresh-secret
 NODE_ENV=production
-PORT=10000
 ```
 
 ## Deployment to Render.com
 
-1. **Connect Repository**: Connect your GitHub repository to Render.com
-2. **Database Setup**: The `render.yaml` file will automatically create a PostgreSQL database
-3. **Environment Variables**: Render will auto-generate `SESSION_SECRET` and `DATABASE_URL`
-4. **Build Process**: 
-   - Build Command: `npm install && npm run build`
-   - Start Command: `npm start`
+Uses Neon Postgres (set `DATABASE_URL` in the Render dashboard). Blueprint: `render.yaml`.
+
+1. Push this repo to GitHub and open [Render Dashboard](https://dashboard.render.com/) → **New** → **Blueprint**
+2. Connect `georgeshengela/www.qbids.ru`
+3. When prompted, set `DATABASE_URL` to your Neon connection string (`sslmode=require`)
+4. Render auto-generates `SESSION_SECRET`, `JWT_SECRET`, and `JWT_REFRESH_SECRET`
+5. Build: `npm install && npm run db:push && npm run build` · Start: `npm start` · Health: `/health`
 
 ## Local Development
 

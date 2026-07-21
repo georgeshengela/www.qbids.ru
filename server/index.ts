@@ -80,11 +80,15 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen({
+  const listenOptions: { port: number; host: string; reusePort?: boolean } = {
     port,
     host: "0.0.0.0",
-    reusePort: true,
-  }, async () => {
+  };
+  // reusePort is unsupported on Windows (ENOTSUP)
+  if (process.platform !== "win32") {
+    listenOptions.reusePort = true;
+  }
+  server.listen(listenOptions, async () => {
     log(`serving on port ${port}`);
     
     // Restart live auctions after server startup
