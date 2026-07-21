@@ -15,6 +15,18 @@ export const translations = {
     heroSubtitle: "Первая пенни-аукционная платформа в Кыргызстане. Делайте ставки от 1 цента и выигрывайте товары стоимостью тысячи сомов.",
     startBidding: "Начать торги",
     learnMore: "Узнать больше",
+
+    // SEO
+    seoHomeTitle: "QBIDS.RU — №1 пенни-аукционы в России | Выигрывайте iPhone за копейки",
+    seoHomeDescription: "Участвуйте в живых пенни-аукционах на QBIDS.RU! Выигрывайте iPhone, MacBook, Samsung и другие товары со скидкой до 99%. Надёжная платформа №1 в России.",
+    seoAuctionsTitle: "Аукционы — QBIDS.RU | Живые и предстоящие пенни-аукционы",
+    seoAuctionsDescription: "Смотрите текущие и предстоящие пенни-аукционы на QBIDS.RU. Делайте ставки от 0,01 ₽ и выигрывайте технику по минимальной цене.",
+    seoHowItWorksTitle: "Как работают пенни-аукционы — QBIDS.RU",
+    seoHowItWorksDescription: "Простое руководство по пенни-аукционам QBIDS.RU: регистрация, ставки, победа и доставка товаров в России.",
+    seoTopUpTitle: "Пополнить баланс — QBIDS.RU | Пакеты бидов в рублях",
+    seoTopUpDescription: "Пополните баланс бидов на QBIDS.RU. Пакеты в российских рублях (₽). Демо-оплата банковской картой.",
+    seoPaymentSuccessTitle: "Оплата успешна — QBIDS.RU",
+    seoPaymentCancelTitle: "Оплата отменена — QBIDS.RU",
     
     // Stats
     activeAuctions: "Активных аукционов",
@@ -512,6 +524,18 @@ export const translations = {
     heroSubtitle: "The first penny auction platform in Kyrgyzstan. Bid from 1 cent and win items worth thousands of soms.",
     startBidding: "Start Bidding",
     learnMore: "Learn More",
+
+    // SEO
+    seoHomeTitle: "QBIDS.RU — #1 Penny Auctions in Russia | Win iPhones for Pennies",
+    seoHomeDescription: "Join live penny auctions on QBIDS.RU! Win iPhones, MacBooks, Samsung and more with up to 99% off. Russia's trusted #1 platform.",
+    seoAuctionsTitle: "Auctions — QBIDS.RU | Live and Upcoming Penny Auctions",
+    seoAuctionsDescription: "Browse live and upcoming penny auctions on QBIDS.RU. Bid from ₽0.01 and win tech at minimal prices.",
+    seoHowItWorksTitle: "How Penny Auctions Work — QBIDS.RU",
+    seoHowItWorksDescription: "A simple guide to QBIDS.RU penny auctions: register, bid, win, and get delivery across Russia.",
+    seoTopUpTitle: "Top Up Balance — QBIDS.RU | Bid Packages in Rubles",
+    seoTopUpDescription: "Top up your bid balance on QBIDS.RU. Packages priced in Russian rubles (₽). Sample card payment UI.",
+    seoPaymentSuccessTitle: "Payment Successful — QBIDS.RU",
+    seoPaymentCancelTitle: "Payment Cancelled — QBIDS.RU",
     
     // Stats
     activeAuctions: "Active Auctions",
@@ -1024,6 +1048,18 @@ export const translations = {
     heroSubtitle: "პირველი პენი აუქციონის პლატფორმა ყირგიზეთში. დაიწყეთ ტოტალიზატორი 1 ცენტიდან და მოიგეთ ნივთები ათასობით სომის ღირებულებით.",
     startBidding: "დაიწყეთ ტოტალიზატორი",
     learnMore: "გაიგეთ მეტი",
+
+    // SEO
+    seoHomeTitle: "QBIDS.RU — №1 პენი-აუქციონები რუსეთში | მოიგე iPhone ფრთხილებად",
+    seoHomeDescription: "მიიღეთ მონაწილეობა ცოცხალ პენი-აუქციონებში QBIDS.RU-ზე! მოიგეთ iPhone, MacBook, Samsung და სხვა პროდუქტები 99%-მდე ფასდაკლებით. საიმედო №1 პლატფორმა რუსეთში.",
+    seoAuctionsTitle: "აუქციონები — QBIDS.RU | ცოცხალი და მომავალი პენი-აუქციონები",
+    seoAuctionsDescription: "ნახეთ მიმდინარე და მომავალი პენი-აუქციონები QBIDS.RU-ზე. დადეთ ფსონი 0,01 ₽-დან და მოიგეთ ტექნიკა მინიმალურ ფასად.",
+    seoHowItWorksTitle: "როგორ მუშაობს პენი-აუქციონები — QBIDS.RU",
+    seoHowItWorksDescription: "მარტივი გზამკვლევი QBIDS.RU პენი-აუქციონებისთვის: რეგისტრაცია, ფსონები, გამარჯვება და მიწოდება რუსეთში.",
+    seoTopUpTitle: "ბალანსის შევსება — QBIDS.RU | ბიდების პაკეტები რუბლებში",
+    seoTopUpDescription: "შეავსეთ ბიდების ბალანსი QBIDS.RU-ზე. პაკეტები რუსულ რუბლებში (₽). საბანკო ბარათის დემო-გადახდა.",
+    seoPaymentSuccessTitle: "გადახდა წარმატებულია — QBIDS.RU",
+    seoPaymentCancelTitle: "გადახდა გაუქმებულია — QBIDS.RU",
     
     // Stats
     activeAuctions: "აქტიური აუქციონები",

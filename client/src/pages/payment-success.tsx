@@ -1,17 +1,14 @@
-import { useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Header } from '@/components/header';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/hooks/use-language';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 import { CheckCircle } from 'lucide-react';
 
 export default function PaymentSuccess() {
   const { t } = useLanguage();
   const [, navigate] = useLocation();
-
-  useEffect(() => {
-    document.title = `${t('paymentSuccessful')} - QBIDS.RU`;
-  }, [t]);
+  useDocumentTitle(t('seoPaymentSuccessTitle'));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">

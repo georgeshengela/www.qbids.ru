@@ -286,7 +286,7 @@ export default function AuctionRules() {
   const lang = (["ru", "en", "ka"].includes(language) ? language : "ru") as Language;
   const c = content[lang];
 
-  useDocumentTitle(c.title);
+  useDocumentTitle(c.title, c.subtitle);
 
   return (
     <div className="min-h-screen bg-gray-50">

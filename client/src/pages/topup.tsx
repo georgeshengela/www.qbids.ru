@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useLanguage } from '@/hooks/use-language';
 import { useAuth } from '@/hooks/use-auth';
 import { Header } from '@/components/header';
@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 import goldBagImage from '@assets/img_1755139968219.png';
 
 const bidPackages = [
@@ -86,22 +87,9 @@ export default function TopUp() {
   const [expiry, setExpiry] = useState('');
   const [cvv, setCvv] = useState('');
 
+  useDocumentTitle(t('seoTopUpTitle'), t('seoTopUpDescription'));
+
   const selectedPackage = bidPackages.find((pkg) => pkg.id === selectedId) ?? bidPackages[2];
-
-  useEffect(() => {
-    document.title = `${t('topUpBalance')} - QBIDS.RU`;
-
-    const descriptionMeta = document.querySelector('meta[name="description"]');
-    const content = 'Пополните баланс бидов на QBIDS.RU в рублях (демо-оплата картой)';
-    if (descriptionMeta) {
-      descriptionMeta.setAttribute('content', content);
-    } else {
-      const meta = document.createElement('meta');
-      meta.name = 'description';
-      meta.content = content;
-      document.head.appendChild(meta);
-    }
-  }, [t]);
 
   const handleSamplePay = (e: React.FormEvent) => {
     e.preventDefault();

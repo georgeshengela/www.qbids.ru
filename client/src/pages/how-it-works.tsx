@@ -1,10 +1,12 @@
 import { Header } from "@/components/header";
 import { useSettings } from "@/hooks/use-settings";
 import { useLanguage } from "@/hooks/use-language";
+import { useDocumentTitle } from "@/hooks/use-document-title";
 
 export default function HowItWorks() {
   const { formatCurrency } = useSettings();
   const { t } = useLanguage();
+  useDocumentTitle(t("seoHowItWorksTitle"), t("seoHowItWorksDescription"));
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />

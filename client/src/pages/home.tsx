@@ -202,12 +202,12 @@ function HeroSection({ isAuthenticated }: { isAuthenticated: boolean }) {
 }
 
 export default function Home() {
-  useDocumentTitle("QBIDS.GE - №1 პენი-აუქციონები საქართველოში | მოიგე iPhone ფრთხილებად");
+  const { t } = useLanguage();
+  useDocumentTitle(t("seoHomeTitle"), t("seoHomeDescription"));
   
   const { connected } = useSocket();
   const { user, isAuthenticated } = useAuth();
   const { formatCurrency } = useSettings();
-  const { t } = useLanguage();
   const [timers, setTimers] = useState<Record<string, number>>({});
   const [auctionBids, setAuctionBids] = useState<Record<string, Bid[]>>({});
   const [visibleUpcomingCount, setVisibleUpcomingCount] = useState(9);
