@@ -1,26 +1,33 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 import { type Request, type Response, type NextFunction } from "express";
 
-// Validate that secrets are present in production
-if (process.env.NODE_ENV === "production") {
-  if (!process.env.JWT_SECRET || !process.env.JWT_REFRESH_SECRET) {
-    throw new Error("JWT_SECRET and JWT_REFRESH_SECRET must be set in production");
+function resolveSecret(envKey: string, devFallback: string): string {
+  const fromEnv = process.env[envKey];
+  if (fromEnv) return fromEnv;
+
+  // Prefer deriving from SESSION_SECRET so production can boot without separate JWT envs
+  if (process.env.SESSION_SECRET) {
+    console.warn(`${envKey} not set; deriving from SESSION_SECRET`);
+    return crypto.createHmac("sha256", process.env.SESSION_SECRET).update(envKey).digest("hex");
   }
+
+  if (process.env.NODE_ENV === "production") {
+    console.warn(`${envKey} and SESSION_SECRET not set; using unstable fallback — set JWT secrets in Render`);
+    const seed = process.env.DATABASE_URL || "qbids-fallback-seed";
+    return crypto.createHmac("sha256", seed).update(envKey).digest("hex");
+  }
+
+  return devFallback;
 }
 
-// Use fallback only in development for convenience
-const JWT_SECRET = process.env.JWT_SECRET || (
-  process.env.NODE_ENV === "development" 
-    ? "dev-only-jwt-secret-change-in-production" 
-    : (() => { throw new Error("JWT_SECRET not configured"); })()
+const JWT_SECRET = resolveSecret("JWT_SECRET", "dev-only-jwt-secret-change-in-production");
+const JWT_REFRESH_SECRET = resolveSecret(
+  "JWT_REFRESH_SECRET",
+  "dev-only-refresh-secret-change-in-production",
 );
 
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || (
-  process.env.NODE_ENV === "development" 
-    ? "dev-only-refresh-secret-change-in-production" 
-    : (() => { throw new Error("JWT_REFRESH_SECRET not configured"); })()
-);
 
 // Token expiration times
 const ACCESS_TOKEN_EXPIRY = "1h"; // 1 hour

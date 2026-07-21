@@ -44,9 +44,9 @@ function HeroSection({ isAuthenticated }: { isAuthenticated: boolean }) {
                 <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-white/30">
                   <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
                   <span className="text-white text-xs md:text-sm font-semibold">
-                    {settings?.language === "ka" ? "პირველი პენი აუქციონი საქართველოში" : 
-                     settings?.language === "en" ? "First Penny Auction in Georgia" :
-                     "Первый пენი аукцион в Грузии"}
+                    {settings?.language === "ka" ? "პირველი პენი აუქციონი რუსეთში" :
+                     settings?.language === "en" ? "First Penny Auction in Russia" :
+                     "Первый пенни-аукцион в России"}
                   </span>
                 </div>
 

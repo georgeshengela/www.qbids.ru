@@ -16,6 +16,11 @@ interface AuthResponse {
 let globalUser: User | null = null;
 let globalLoading = true;
 let authInitPromise: Promise<void> | null = null;
+const listeners = new Set<() => void>();
+
+function notifyAuthListeners() {
+  listeners.forEach((listener) => listener());
+}
 
 export function useAuth() {
   const queryClient = useQueryClient();
@@ -23,12 +28,22 @@ export function useAuth() {
   const [isLoading, setIsLoading] = useState(globalLoading);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
+  // Keep all useAuth() consumers in sync (Header + AuthModal, etc.)
+  useEffect(() => {
+    const listener = () => {
+      setUser(globalUser);
+      setIsLoading(globalLoading);
+    };
+    listeners.add(listener);
+    return () => {
+      listeners.delete(listener);
+    };
+  }, []);
+
   // Check localStorage for welcome modal flag
   useEffect(() => {
     const shouldShowWelcome = localStorage.getItem('showWelcomeModal');
-    console.log('useEffect - checking localStorage flag:', shouldShowWelcome, 'user:', user?.username);
     if (shouldShowWelcome === 'true' && user) {
-      console.log('Setting welcome modal to true');
       setShowWelcomeModal(true);
       localStorage.removeItem('showWelcomeModal');
     }
@@ -55,6 +70,7 @@ export function useAuth() {
         .finally(() => {
           globalLoading = false;
           authInitPromise = null;
+          notifyAuthListeners();
         });
     }
 
@@ -73,7 +89,7 @@ export function useAuth() {
     onSuccess: (data) => {
       globalUser = data.user;
       setUser(data.user);
-      // Invalidate all queries to refresh data after login
+      notifyAuthListeners();
       queryClient.invalidateQueries();
     },
   });
@@ -86,7 +102,7 @@ export function useAuth() {
     onSuccess: (data) => {
       globalUser = data.user;
       setUser(data.user);
-      // Invalidate all queries to refresh data after registration
+      notifyAuthListeners();
       queryClient.invalidateQueries();
     },
   });
@@ -98,6 +114,7 @@ export function useAuth() {
     onSuccess: () => {
       globalUser = null;
       setUser(null);
+      notifyAuthListeners();
       queryClient.clear();
     },
   });
@@ -108,15 +125,14 @@ export function useAuth() {
       if (res.ok) {
         const data = await res.json();
         globalUser = data.user || null;
-        setUser(globalUser);
       } else {
         globalUser = null;
-        setUser(null);
       }
-    } catch (error) {
+    } catch {
       globalUser = null;
-      setUser(null);
     }
+    setUser(globalUser);
+    notifyAuthListeners();
   };
 
   return {

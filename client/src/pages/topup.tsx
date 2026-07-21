@@ -1,14 +1,13 @@
-import { useEffect } from 'react';
-import { useLocation } from 'wouter';
+import { useEffect, useState } from 'react';
 import { useLanguage } from '@/hooks/use-language';
 import { useAuth } from '@/hooks/use-auth';
 import { Header } from '@/components/header';
-import { trackTopUp } from '@/lib/analytics';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import goldBagImage from '@assets/img_1755139968219.png';
 
-// Bid packages data
 const bidPackages = [
   {
     id: 1,
@@ -62,235 +61,280 @@ const bidPackages = [
   }
 ];
 
+function formatRUB(amount: number) {
+  return `${amount.toLocaleString('ru-RU')} ₽`;
+}
+
+function formatCardNumber(value: string) {
+  const digits = value.replace(/\D/g, '').slice(0, 16);
+  return digits.replace(/(\d{4})(?=\d)/g, '$1 ').trim();
+}
+
+function formatExpiry(value: string) {
+  const digits = value.replace(/\D/g, '').slice(0, 4);
+  if (digits.length <= 2) return digits;
+  return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+}
+
 export default function TopUp() {
   const { t } = useLanguage();
   const { user } = useAuth();
-  const [, navigate] = useLocation();
   const { toast } = useToast();
+  const [selectedId, setSelectedId] = useState<number>(3);
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardName, setCardName] = useState('');
+  const [expiry, setExpiry] = useState('');
+  const [cvv, setCvv] = useState('');
+
+  const selectedPackage = bidPackages.find((pkg) => pkg.id === selectedId) ?? bidPackages[2];
 
   useEffect(() => {
-    // Set page title
     document.title = `${t('topUpBalance')} - QBIDS.RU`;
-    
-    // Set viewport meta tag
-    const viewportMeta = document.querySelector('meta[name="viewport"]');
-    if (!viewportMeta) {
-      const meta = document.createElement('meta');
-      meta.name = 'viewport';
-      meta.content = 'width=device-width, initial-scale=1';
-      document.head.appendChild(meta);
-    }
-    
-    // Set description meta tag
+
     const descriptionMeta = document.querySelector('meta[name="description"]');
+    const content = 'Пополните баланс бидов на QBIDS.RU в рублях (демо-оплата картой)';
     if (descriptionMeta) {
-      descriptionMeta.setAttribute('content', 'Пополните баланс для участия в аукционах QBIDS.KG');
+      descriptionMeta.setAttribute('content', content);
     } else {
       const meta = document.createElement('meta');
       meta.name = 'description';
-      meta.content = 'Пополните баланс для участия в аукционах QBIDS.KG';
+      meta.content = content;
       document.head.appendChild(meta);
     }
   }, [t]);
 
-  const handleBuyPackage = (packageId: number) => {
-    // Check if user is logged in
-    if (!user) {
-      toast({
-        title: "Необходима авторизация",
-        description: "Пожалуйста, войдите в систему для пополнения баланса",
-        variant: "destructive",
-      });
-      navigate('/login');
-      return;
-    }
+  const handleSamplePay = (e: React.FormEvent) => {
+    e.preventDefault();
 
-    // Find the package
-    const selectedPackage = bidPackages.find(pkg => pkg.id === packageId);
-    if (selectedPackage) {
-      // Track the purchase initiation
-      trackTopUp(selectedPackage.price);
-    }
-
-    // Static Digiseller payment URLs with user ID passed as parameter
-    const basePaymentUrls: { [key: number]: string } = {
-      1: 'https://oplata.info/asp2/pay_wm.asp?id_d=5484776&lang=ru-RU',
-      2: 'https://oplata.info/asp2/pay_wm.asp?id_d=5487610&lang=ru-RU',
-      3: 'https://oplata.info/asp2/pay_wm.asp?id_d=5355203&lang=ru-RU',
-      4: 'https://oplata.info/asp2/pay_wm.asp?id_d=5355213&lang=ru-RU',
-      5: 'https://oplata.info/asp2/pay_wm.asp?id_d=5355214&lang=ru-RU'
-    };
-
-    const baseUrl = basePaymentUrls[packageId];
-    if (baseUrl) {
-      // Add user ID as custom parameter - Digiseller will pass it back in Through parameter
-      const paymentUrl = `${baseUrl}&userid=${user.id}`;
-      
-      // Open Digiseller payment page in new tab
-      window.open(paymentUrl, '_blank', 'noopener,noreferrer');
-      
-      // Show info message
-      toast({
-        title: "Платежная страница открыта",
-        description: "После оплаты обновите баланс через профиль или обратитесь в поддержку",
-        duration: 7000,
-      });
-    }
-  };
-
-  const formatCurrency = (amount: number) => {
-    return `${amount.toLocaleString()} сом`;
+    toast({
+      title: "Демо-режим",
+      description: "Это образец формы оплаты картой. Реальные платежи пока не подключены.",
+      duration: 6000,
+    });
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <Header />
       <div className="max-w-[1504px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-6">
+        <div className="text-center mb-10">
+          <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">
             {t('topUpBalance')}
           </h1>
           <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-            Выберите пакет бидов и начните выигрывать в аукционах уже сегодня
+            Выберите пакет бидов. Оплата в рублях (₽) — форма карты ниже только для демонстрации
           </p>
+          <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-amber-50 border border-amber-200 px-4 py-2 text-sm text-amber-800">
+            <i className="fas fa-info-circle"></i>
+            <span>Образец пополнения картой — платежи не списываются</span>
+          </div>
         </div>
 
-        {/* Bid Packages Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-12">
-          {bidPackages.map((pkg) => (
-            <div 
-              key={pkg.id} 
-              className={`relative bg-white rounded-3xl shadow-xl border-2 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 ${
-                pkg.popular 
-                  ? 'border-gradient-to-r from-yellow-400 to-amber-500 ring-4 ring-yellow-100' 
-                  : 'border-slate-200 hover:border-blue-300'
-              }`}
-            >
-              {/* Popular Badge */}
-              {pkg.popular && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                  <div className="bg-gradient-to-r from-yellow-400 to-amber-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center space-x-1">
-                    <span>⭐</span>
-                    <span>ПОПУЛЯРНЫЙ</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-10">
+          {bidPackages.map((pkg) => {
+            const isSelected = pkg.id === selectedId;
+            return (
+              <button
+                key={pkg.id}
+                type="button"
+                onClick={() => setSelectedId(pkg.id)}
+                className={`relative text-left bg-white rounded-3xl shadow-xl border-2 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 ${
+                  isSelected
+                    ? 'border-blue-500 ring-4 ring-blue-100'
+                    : pkg.popular
+                      ? 'border-amber-300'
+                      : 'border-slate-200 hover:border-blue-300'
+                }`}
+              >
+                {pkg.popular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                    <div className="bg-gradient-to-r from-yellow-400 to-amber-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                      ПОПУЛЯРНЫЙ
+                    </div>
+                  </div>
+                )}
+
+                <div className="p-5">
+                  <div className="w-20 h-20 mx-auto mb-4">
+                    <img
+                      src={goldBagImage}
+                      alt="Пакет бидов"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+
+                  <h3 className="text-lg font-bold text-slate-900 text-center mb-1">
+                    {pkg.title}
+                  </h3>
+                  <p className="text-xs text-slate-500 text-center mb-3">{pkg.description}</p>
+
+                  <div className="text-center mb-3">
+                    <div className="text-2xl font-bold text-slate-900">{formatRUB(pkg.price)}</div>
+                    <div className="text-sm text-slate-400 line-through">{formatRUB(pkg.originalPrice)}</div>
+                    <div className="inline-block bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold mt-2">
+                      Экономия {formatRUB(pkg.savings)}
+                    </div>
+                  </div>
+
+                  <div className={`text-center text-sm font-medium ${isSelected ? 'text-blue-600' : 'text-slate-400'}`}>
+                    {isSelected ? 'Выбрано' : 'Выбрать'}
                   </div>
                 </div>
-              )}
+              </button>
+            );
+          })}
+        </div>
 
-              <div className="p-6">
-                {/* Gold Coins Bag Image */}
-                <div className="w-24 h-24 mx-auto mb-6 relative">
-                  <img 
-                    src={goldBagImage}
-                    alt="Gold coins bag"
-                    className="w-full h-full object-contain"
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-12">
+          <div className="lg:col-span-4 bg-white rounded-3xl shadow-xl border border-slate-200 p-6 md:p-8">
+            <h2 className="text-lg font-bold text-slate-900 mb-4">Ваш заказ</h2>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-slate-500">Пакет</span>
+                <span className="font-semibold text-slate-900">{selectedPackage.title}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Биды</span>
+                <span className="font-semibold text-slate-900">{selectedPackage.bids}</span>
+              </div>
+              {user && (
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Аккаунт</span>
+                  <span className="font-semibold text-slate-900">{user.username}</span>
+                </div>
+              )}
+              <div className="border-t border-slate-100 pt-3 flex justify-between items-baseline">
+                <span className="text-slate-700 font-medium">К оплате</span>
+                <span className="text-2xl font-bold text-slate-900">{formatRUB(selectedPackage.price)}</span>
+              </div>
+              <p className="text-xs text-slate-400">Валюта: российский рубль (RUB)</p>
+            </div>
+          </div>
+
+          <div className="lg:col-span-8 bg-white rounded-3xl shadow-xl border border-slate-200 p-6 md:p-8">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-lg font-bold text-slate-900">Оплата банковской картой</h2>
+              <div className="flex items-center gap-2 text-slate-400 text-lg">
+                <i className="fab fa-cc-visa"></i>
+                <i className="fab fa-cc-mastercard"></i>
+                <i className="fab fa-cc-mir"></i>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-start">
+              {/* Sample card preview */}
+              <div className="rounded-2xl bg-gradient-to-br from-slate-800 via-slate-700 to-blue-900 text-white p-5 md:p-6 shadow-lg min-h-[180px]">
+                <div className="flex justify-between items-start mb-8">
+                  <span className="text-xs uppercase tracking-widest text-slate-300">Sample card</span>
+                  <span className="text-sm font-semibold">{formatRUB(selectedPackage.price)}</span>
+                </div>
+                <div className="font-mono text-lg md:text-xl tracking-widest mb-4">
+                  {cardNumber || '•••• •••• •••• ••••'}
+                </div>
+                <div className="flex justify-between text-sm">
+                  <div>
+                    <div className="text-[10px] uppercase text-slate-400">Holder</div>
+                    <div className="uppercase tracking-wide">{cardName || 'IVAN IVANOV'}</div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] uppercase text-slate-400">Exp</div>
+                    <div>{expiry || 'MM/YY'}</div>
+                  </div>
+                </div>
+              </div>
+
+              <form onSubmit={handleSamplePay} className="space-y-4">
+                <div>
+                  <Label htmlFor="card-number">Номер карты</Label>
+                  <Input
+                    id="card-number"
+                    inputMode="numeric"
+                    autoComplete="cc-number"
+                    placeholder="2200 0000 0000 0000"
+                    value={cardNumber}
+                    onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                    className="mt-1 h-11 font-mono"
                   />
                 </div>
 
-                {/* Package Title */}
-                <h3 className="text-xl font-bold text-slate-900 text-center mb-2">
-                  {pkg.title}
-                </h3>
+                <div>
+                  <Label htmlFor="card-name">Имя на карте</Label>
+                  <Input
+                    id="card-name"
+                    autoComplete="cc-name"
+                    placeholder="IVAN IVANOV"
+                    value={cardName}
+                    onChange={(e) => setCardName(e.target.value.toUpperCase())}
+                    className="mt-1 h-11"
+                  />
+                </div>
 
-                {/* Bids Count */}
-                <div className="text-center mb-4">
-                  <div className="text-3xl font-bold text-blue-600 mb-1">
-                    {pkg.bids}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="card-expiry">Срок действия</Label>
+                    <Input
+                      id="card-expiry"
+                      inputMode="numeric"
+                      autoComplete="cc-exp"
+                      placeholder="MM/YY"
+                      value={expiry}
+                      onChange={(e) => setExpiry(formatExpiry(e.target.value))}
+                      className="mt-1 h-11 font-mono"
+                    />
                   </div>
-                  <div className="text-sm text-slate-500 font-medium">
-                    {pkg.bids === 1 ? 'бид' : 'бидов'}
+                  <div>
+                    <Label htmlFor="card-cvv">CVV</Label>
+                    <Input
+                      id="card-cvv"
+                      type="password"
+                      inputMode="numeric"
+                      autoComplete="cc-csc"
+                      placeholder="•••"
+                      maxLength={4}
+                      value={cvv}
+                      onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                      className="mt-1 h-11 font-mono"
+                    />
                   </div>
                 </div>
 
-                {/* Description */}
-                <p className="text-sm text-slate-600 text-center mb-4">
-                  {pkg.description}
-                </p>
-
-                {/* Pricing */}
-                <div className="text-center mb-6">
-                  <div className="text-2xl font-bold text-slate-900 mb-1">
-                    {formatCurrency(pkg.price)}
-                  </div>
-                  <div className="text-sm text-slate-400 line-through">
-                    {formatCurrency(pkg.originalPrice)}
-                  </div>
-                  <div className="inline-block bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold mt-2">
-                    Экономия {formatCurrency(pkg.savings)}
-                  </div>
-                </div>
-
-                {/* Buy Button */}
-                <Button 
-                  onClick={() => handleBuyPackage(pkg.id)}
-                  className={`w-full h-12 rounded-xl font-semibold transition-all duration-200 ${
-                    pkg.popular 
-                      ? 'bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-white shadow-lg' 
-                      : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg'
-                  }`}
+                <Button
+                  type="submit"
+                  className="w-full h-12 rounded-xl font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-md"
                 >
-                  <i className="fas fa-shopping-cart mr-2"></i>
-                  Купить сейчас
+                  <i className="fas fa-credit-card mr-2"></i>
+                  Оплатить {formatRUB(selectedPackage.price)} (демо)
                 </Button>
-              </div>
+
+                <p className="text-center text-xs text-slate-400">
+                  Форма не отправляет данные и не проводит оплату — только образец интерфейса
+                </p>
+              </form>
             </div>
-          ))}
+          </div>
         </div>
 
-        {/* Features Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           <div className="text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i className="fas fa-shield-alt text-green-600 text-2xl"></i>
+              <i className="fas fa-ruble-sign text-green-600 text-2xl"></i>
             </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">Безопасная оплата</h3>
-            <p className="text-slate-600">Все платежи защищены SSL шифрованием и проходят через надежную платежную систему</p>
+            <h3 className="text-xl font-semibold text-slate-900 mb-2">Цены в рублях</h3>
+            <p className="text-slate-600">Все пакеты бидов отображаются в российских рублях (₽)</p>
           </div>
-
           <div className="text-center">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i className="fas fa-bolt text-blue-600 text-2xl"></i>
+              <i className="fas fa-credit-card text-blue-600 text-2xl"></i>
             </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">Мгновенное зачисление</h3>
-            <p className="text-slate-600">Биды поступят на ваш счет автоматически сразу после успешной оплаты</p>
+            <h3 className="text-xl font-semibold text-slate-900 mb-2">Карта (образец)</h3>
+            <p className="text-slate-600">Показан пример экрана оплаты банковской картой без реальных списаний</p>
           </div>
-
           <div className="text-center">
             <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i className="fas fa-headset text-purple-600 text-2xl"></i>
+              <i className="fas fa-flask text-purple-600 text-2xl"></i>
             </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">Поддержка 24/7</h3>
-            <p className="text-slate-600">Наша команда поддержки готова помочь вам в любое время дня и ночи</p>
-          </div>
-        </div>
-
-        {/* How it Works */}
-        <div className="bg-white rounded-3xl shadow-xl p-8 mb-12">
-          <h2 className="text-3xl font-bold text-slate-900 text-center mb-8">
-            Как это работает
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-lg">
-                1
-              </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">Выберите пакет</h3>
-              <p className="text-slate-600">Выберите подходящий пакет бидов из представленных выше</p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-lg">
-                2
-              </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">Оплатите покупку</h3>
-              <p className="text-slate-600">Безопасно оплатите выбранный пакет любым удобным способом</p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-white font-bold text-lg">
-                3
-              </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">Начните участвовать</h3>
-              <p className="text-slate-600">Биды автоматически зачислятся и вы сможете участвовать в аукционах</p>
-            </div>
+            <h3 className="text-xl font-semibold text-slate-900 mb-2">Демо-режим</h3>
+            <p className="text-slate-600">Подключение настоящей платёжной системы можно добавить позже</p>
           </div>
         </div>
       </div>

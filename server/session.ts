@@ -5,9 +5,13 @@ import { pool } from "./db";
 const PgSession = connectPgSimple(session);
 
 export function createSessionMiddleware() {
+  // COOKIE_SECURE=true for HTTPS (Render). false for local http://
+  const isSecure = process.env.COOKIE_SECURE === "true";
+
   console.log('Creating session middleware with config:', {
     nodeEnv: process.env.NODE_ENV,
     cookieSecure: process.env.COOKIE_SECURE,
+    isSecure,
     hasSessionSecret: !!process.env.SESSION_SECRET,
     hasDatabaseUrl: !!process.env.DATABASE_URL
   });
@@ -16,16 +20,17 @@ export function createSessionMiddleware() {
     store: new PgSession({
       pool: pool,
       tableName: "sessions",
-      createTableIfMissing: true, // Let it create the table if needed
+      createTableIfMissing: true,
     }),
     secret: process.env.SESSION_SECRET || "fallback-secret-for-dev-only",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: true, // REQUIRED when sameSite is "none" - Replit proxy handles HTTPS
+      // Secure cookies are rejected by browsers on http://localhost
+      secure: isSecure,
       httpOnly: true,
-      maxAge: 30 * 60 * 1000, // 30 minutes (banking standard)
-      sameSite: "none", // Required for Replit proxy/iframe environment
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+      sameSite: "lax",
     },
   });
 }
