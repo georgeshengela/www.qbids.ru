@@ -119,15 +119,15 @@ export function Footer() {
             <div className="space-y-3">
               <div className="flex items-center text-gray-300 text-sm">
                 <i className="fas fa-map-marker-alt mr-3 text-blue-400"></i>
-                <span>{settings?.contactAddress || "თბილისი, საქართველო"}</span>
+                <span>{settings?.contactAddress || "Москва, Россия"}</span>
               </div>
               <div className="flex items-center text-gray-300 text-sm">
                 <i className="fas fa-phone mr-3 text-blue-400"></i>
-                <span>{settings?.contactPhone || "+995 593 09 00 00"}</span>
+                <span>{settings?.contactPhone || "+7 (495) 120-00-00"}</span>
               </div>
               <div className="flex items-center text-gray-300 text-sm">
                 <i className="fas fa-envelope mr-3 text-blue-400"></i>
-                <span>{settings?.contactEmail || "info@qbids.ge"}</span>
+                <span>{settings?.contactEmail || "info@qbids.ru"}</span>
               </div>
               <div className="flex items-center text-gray-300 text-sm">
                 <i className="fas fa-clock mr-3 text-blue-400"></i>
@@ -207,7 +207,7 @@ export function Footer() {
             <p className="text-blue-400 text-sm">
               {settings?.language === "ru" && "Первая пенни-аукционная платформа в России"}
               {settings?.language === "en" && "First penny auction platform in Russia"}
-              {settings?.language === "ka" && "პირველი პენი აუქციონის პლატფორმა საქართველოში"}
+              {settings?.language === "ka" && "პირველი პენი აუქციონის პლატფორმა რუსეთში"}
               {!settings?.language && "Первая пенни-аукционная платформа в России"}
             </p>
           </div>

@@ -1,112 +1,308 @@
 import { useDocumentTitle } from "@/hooks/use-document-title";
-import { useSettings } from "@/hooks/use-settings";
 import { useLanguage } from "@/hooks/use-language";
 import { Header } from "@/components/header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import type { Language } from "@/lib/i18n";
+
+const content = {
+  ru: {
+    title: "Правила аукциона - QBIDS.RU",
+    heading: "Правила аукциона",
+    subtitle: "Ознакомьтесь с правилами пенни-аукционов и условиями участия",
+    sections: [
+      {
+        icon: "fas fa-play-circle",
+        title: "Как начать участвовать",
+        color: "green",
+        rules: [
+          "Зарегистрируйтесь на QBIDS.RU",
+          "Пополните баланс бидов удобным способом оплаты",
+          "Выберите интересующий аукцион",
+          "Дождитесь старта и делайте ставки",
+        ],
+      },
+      {
+        icon: "fas fa-gavel",
+        title: "Правила ставок",
+        color: "blue",
+        rules: [
+          "Каждая ставка списывает 1 бид с вашего баланса",
+          "Ставка повышает цену товара на 0,01 ₽",
+          "Таймер продлевается на 10–15 секунд после каждой ставки",
+          "Отменить ставку после размещения нельзя",
+          "Минимальный интервал между ставками одного пользователя — 1 секунда",
+        ],
+      },
+      {
+        icon: "fas fa-trophy",
+        title: "Определение победителя",
+        color: "yellow",
+        rules: [
+          "Побеждает пользователь, сделавший последнюю ставку",
+          "Аукцион завершается, когда таймер достигает 0",
+          "Победитель оплачивает итоговую цену товара",
+          "Товар резервируется за победителем на 48 часов",
+          "При отказе от покупки товар может перейти предыдущему участнику",
+        ],
+      },
+      {
+        icon: "fas fa-coins",
+        title: "Биды и оплата",
+        color: "orange",
+        rules: [
+          "Биды списываются сразу при размещении ставки",
+          "Потраченные биды не возвращаются независимо от результата",
+          "Минимальная покупка — пакет от 50 бидов",
+          "Биды действуют 365 дней с момента покупки",
+          "Неиспользованные биды денежному возврату не подлежат",
+        ],
+      },
+    ],
+    prohibitedTitle: "Запрещённые действия",
+    prohibitedDesc: "Нарушение этих правил ведёт к блокировке аккаунта без возврата средств",
+    prohibited: [
+      "Использование ботов и автоматических программ",
+      "Создание нескольких аккаунтов одним пользователем",
+      "Попытки взлома или нарушения работы сайта",
+      "Оскорбительное поведение к другим участникам",
+      "Мошенничество или обман системы",
+      "Продажа или передача аккаунта третьим лицам",
+    ],
+    deliveryTitle: "Правила доставки",
+    deliveryDesc: "Условия получения выигранных товаров",
+    delivery: [
+      { title: "Самовывоз", description: "Бесплатно из пункта выдачи в Москве", time: "Будни 9:00–18:00" },
+      { title: "Доставка по Москве", description: "Курьерская доставка", time: "от 300 ₽, 1–2 рабочих дня" },
+      { title: "Доставка по России", description: "СДЭК, Почта России и другие службы", time: "от 400 ₽, 2–7 рабочих дней" },
+    ],
+    notesTitle: "Важные замечания",
+    notes: [
+      {
+        tone: "yellow",
+        title: "Ответственность участника",
+        text: "Участвуя в аукционах, вы подтверждаете, что понимаете принцип пенни-аукционов и принимаете возможные риски.",
+      },
+      {
+        tone: "blue",
+        title: "Техническая поддержка",
+        text: "При технических сбоях во время аукциона сразу обратитесь в поддержку. Компенсация возможна только при подтверждённых технических проблемах.",
+      },
+      {
+        tone: "green",
+        title: "Честная игра",
+        text: "QBIDS.RU стремится обеспечить честные и прозрачные аукционы для всех участников и контролирует систему от мошенничества.",
+      },
+    ],
+  },
+  en: {
+    title: "Auction Rules - QBIDS.RU",
+    heading: "Auction Rules",
+    subtitle: "Learn the penny auction rules and participation terms",
+    sections: [
+      {
+        icon: "fas fa-play-circle",
+        title: "How to start",
+        color: "green",
+        rules: [
+          "Register on QBIDS.RU",
+          "Top up your bid balance",
+          "Choose an auction",
+          "Wait for the start and place bids",
+        ],
+      },
+      {
+        icon: "fas fa-gavel",
+        title: "Bidding rules",
+        color: "blue",
+        rules: [
+          "Each bid costs 1 bid from your balance",
+          "Each bid raises the price by ₽0.01",
+          "The timer extends by 10–15 seconds after each bid",
+          "Bids cannot be cancelled after placement",
+          "Minimum interval between one user’s bids is 1 second",
+        ],
+      },
+      {
+        icon: "fas fa-trophy",
+        title: "Determining the winner",
+        color: "yellow",
+        rules: [
+          "The last bidder wins",
+          "The auction ends when the timer reaches 0",
+          "The winner pays the final item price",
+          "The item is reserved for 48 hours",
+          "If the winner refuses, the item may go to the previous bidder",
+        ],
+      },
+      {
+        icon: "fas fa-coins",
+        title: "Bids and payments",
+        color: "orange",
+        rules: [
+          "Bids are deducted immediately when placed",
+          "Spent bids are non-refundable",
+          "Minimum purchase starts from 50-bid packs",
+          "Bids are valid for 365 days from purchase",
+          "Unused bids are not redeemable for cash",
+        ],
+      },
+    ],
+    prohibitedTitle: "Prohibited actions",
+    prohibitedDesc: "Violations lead to account blocking without refunds",
+    prohibited: [
+      "Using bots or automation tools",
+      "Creating multiple accounts",
+      "Attempts to hack or disrupt the site",
+      "Abusive behavior toward others",
+      "Fraud or system abuse",
+      "Selling or transferring accounts",
+    ],
+    deliveryTitle: "Delivery rules",
+    deliveryDesc: "How winners receive their items",
+    delivery: [
+      { title: "Pickup", description: "Free from a Moscow pickup point", time: "Weekdays 9:00–18:00" },
+      { title: "Moscow delivery", description: "Courier delivery", time: "from ₽300, 1–2 business days" },
+      { title: "Russia-wide", description: "CDEK, Russian Post and other carriers", time: "from ₽400, 2–7 business days" },
+    ],
+    notesTitle: "Important notes",
+    notes: [
+      {
+        tone: "yellow",
+        title: "Participant responsibility",
+        text: "By joining auctions you confirm you understand penny auctions and accept related risks.",
+      },
+      {
+        tone: "blue",
+        title: "Technical support",
+        text: "Contact support immediately if technical issues occur during an auction. Compensation applies only to confirmed technical problems.",
+      },
+      {
+        tone: "green",
+        title: "Fair play",
+        text: "QBIDS.RU aims for fair, transparent auctions and monitors the system against fraud.",
+      },
+    ],
+  },
+  ka: {
+    title: "აუქციონის წესები - QBIDS.RU",
+    heading: "აუქციონის წესები",
+    subtitle: "გაეცანით პენი-აუქციონების წესებს და მონაწილეობის პირობებს",
+    sections: [
+      {
+        icon: "fas fa-play-circle",
+        title: "როგორ დავიწყოთ მონაწილეობა",
+        color: "green",
+        rules: [
+          "დარეგისტრირდით QBIDS.RU-ზე",
+          "შეავსეთ ბიდების ბალანსი",
+          "აირჩიეთ სასურველი აუქციონი",
+          "დაელოდეთ დაწყებას და დაიწყეთ ფსონები",
+        ],
+      },
+      {
+        icon: "fas fa-gavel",
+        title: "ფსონების წესები",
+        color: "blue",
+        rules: [
+          "თითოეული ფსონი = 1 ბიდი ბალანსიდან",
+          "ფსონი ზრდის ფასს 0,01 ₽-ით",
+          "ტაიმერი გრძელდება 10–15 წამით ყოველი ფსონის შემდეგ",
+          "ფსონის გაუქმება შეუძლებელია",
+          "მინიმალური ინტერვალი ერთი მომხმარებლის ფსონებს შორის — 1 წამი",
+        ],
+      },
+      {
+        icon: "fas fa-trophy",
+        title: "გამარჯვებულის განსაზღვრა",
+        color: "yellow",
+        rules: [
+          "იმარჯვებს ბოლო ფსონის ავტორი",
+          "აუქციონი სრულდება ტაიმერის 0-ზე",
+          "გამარჯვებული იხდის საბოლოო ფასს",
+          "პროდუქტი რეზერვირებულია 48 საათით",
+          "უარის შემთხვევაში შეიძლება გადავიდეს წინა მონაწილეზე",
+        ],
+      },
+      {
+        icon: "fas fa-coins",
+        title: "ბიდები და გადახდა",
+        color: "orange",
+        rules: [
+          "ბიდები იჭრება ფსონისთანავე",
+          "დახარჯული ბიდები არ ბრუნდება",
+          "მინიმალური პაკეტი — 50 ბიდიდან",
+          "ბიდები მოქმედებს 365 დღე",
+          "გამოუყენებელი ბიდები ფულად არ ანაზღაურდება",
+        ],
+      },
+    ],
+    prohibitedTitle: "აკრძალული ქმედებები",
+    prohibitedDesc: "წესების დარღვევა იწვევს ანგარიშის დაბლოკვას თანხის დაბრუნების გარეშე",
+    prohibited: [
+      "ბოტებისა და ავტომატური პროგრამების გამოყენება",
+      "მრავალი ანგარიშის შექმნა",
+      "საიტის გატეხვის მცდელობები",
+      "შეურაცხმყოფელი ქცევა",
+      "თაღლითობა",
+      "ანგარიშის გაყიდვა/გადაცემა",
+    ],
+    deliveryTitle: "მიწოდების წესები",
+    deliveryDesc: "მოგებული პროდუქტების მიღების პირობები",
+    delivery: [
+      { title: "თვითგატანა", description: "უფასოდ მოსკოვის პუნქტიდან", time: "სამუშაო დღეები 9:00–18:00" },
+      { title: "მიწოდება მოსკოვში", description: "კურიერი", time: "300 ₽-დან, 1–2 სამუშაო დღე" },
+      { title: "მიწოდება რუსეთში", description: "CDEK, Почта России და სხვა", time: "400 ₽-დან, 2–7 სამუშაო დღე" },
+    ],
+    notesTitle: "მნიშვნელოვანი შენიშვნები",
+    notes: [
+      {
+        tone: "yellow",
+        title: "მონაწილის პასუხისმგებლობა",
+        text: "აუქციონებში მონაწილეობით ადასტურებთ, რომ გესმით პენი-აუქციონების პრინციპი და იღებთ რისკებს.",
+      },
+      {
+        tone: "blue",
+        title: "ტექნიკური მხარდაჭერა",
+        text: "ტექნიკური პრობლემისას დაუყოვნებლივ დაუკავშირდით მხარდაჭერას. კომპენსაცია მხოლოდ დადასტურებული პრობლემებისას.",
+      },
+      {
+        tone: "green",
+        title: "სამართლიანი თამაში",
+        text: "QBIDS.RU უზრუნველყოფს სამართლიან და გამჭვირვალე აუქციონებს და აკონტროლებს თაღლითობას.",
+      },
+    ],
+  },
+} as const;
+
+const noteStyles = {
+  yellow: { box: "bg-yellow-50 border-yellow-200", title: "text-yellow-800", text: "text-yellow-700" },
+  blue: { box: "bg-blue-50 border-blue-200", title: "text-blue-800", text: "text-blue-700" },
+  green: { box: "bg-green-50 border-green-200", title: "text-green-800", text: "text-green-700" },
+} as const;
 
 export default function AuctionRules() {
-  useDocumentTitle("აუქციონის წესები - QBIDS.GE | პენი-აუქციონების პირობები");
-  const { formatCurrency } = useSettings();
-  const { t } = useLanguage();
+  const { language } = useLanguage();
+  const lang = (["ru", "en", "ka"].includes(language) ? language : "ru") as Language;
+  const c = content[lang];
 
-  const rulesSections = [
-    {
-      icon: "fas fa-play-circle",
-      title: "როგორ დავიწყოთ მონაწილეობა",
-      color: "green",
-      rules: [
-        "დარეგისტრირდით QBIDS.GE-ზე",
-        "შეავსეთ ფსონების ბალანსი მოსახერხებელი გადახდის მეთოდით",
-        "აირჩიეთ სასურველი აუქციონი",
-        "დაელოდეთ აუქციონის დაწყებას და დაიწყეთ ფსონების დადება"
-      ]
-    },
-    {
-      icon: "fas fa-gavel",
-      title: "ფსონების წესები",
-      color: "blue",
-      rules: [
-        "თითოეული ფსონი ღირს 1 ფსონი თქვენი ბალანსიდან",
-        "ფსონი ზრდის პროდუქტის ფასს 0.01 ₾-ით",
-        "აუქციონის დრო გრძელდება 10-15 წამით ყოველი ფსონის შემდეგ",
-        "ფსონების გაუქმება შეუძლებელია მათი განთავსების შემდეგ",
-        "მინიმალური ინტერვალი ერთი მომხმარებლის ფსონებს შორის - 1 წამი"
-      ]
-    },
-    {
-      icon: "fas fa-trophy",
-      title: "გამარჯვებულის განსაზღვრა",
-      color: "yellow",
-      rules: [
-        "იმარჯვებს მომხმარებელი, რომელმაც ბოლო ფსონი დადო",
-        "აუქციონი სრულდება, როდესაც ტაიმერი მიაღწევს 0-ს",
-        "გამარჯვებული იხდის პროდუქტის საბოლოო ფასს",
-        "პროდუქტი რეზერვირებულია გამარჯვებულისთვის 48 საათის განმავლობაში",
-        "შესყიდვაზე უარის თქმის შემთხვევაში პროდუქტი გადადის წინა მონაწილეზე"
-      ]
-    },
-    {
-      icon: "fas fa-coins",
-      title: "ფსონები და გადახდა",
-      color: "orange",
-      rules: [
-        "ფსონები ჩამოიჭრება ფსონის განთავსებისთანავე",
-        "დახარჯული ფსონები არ ბრუნდება შედეგის მიუხედავად",
-        "მინიმალური შესყიდვა - 10 ფსონი",
-        "ფსონები მოქმედებს 365 დღის განმავლობაში შეძენის მომენტიდან",
-        "გამოუყენებელი ფსონები არ ექვემდებარება ფულად ანაზღაურებას"
-      ]
-    }
-  ];
-
-  const prohibitedActions = [
-    "ავტომატური პროგრამებისა და ბოტების გამოყენება",
-    "ერთი მომხმარებლის მიერ მრავალი ანგარიშის შექმნა",
-    "საიტის გატეხვის ან მუშაობის დარღვევის მცდელობები",
-    "შეურაცხმყოფელი ქცევა სხვა მონაწილეების მიმართ",
-    "თაღლითობის ან სისტემის მოტყუების მცდელობები",
-    "ანგარიშის გაყიდვა ან გადაცემა მესამე პირებზე"
-  ];
-
-  const deliveryRules = [
-    {
-      title: "თვითგატანა",
-      description: "უფასოდ ოფისიდან თბილისში",
-      time: "სამუშაო დღეებში 9:00-დან 18:00-მდე"
-    },
-    {
-      title: "მიწოდება თბილისში",
-      description: "კურიერის მიწოდება",
-      time: "10 ლარი, 1-2 სამუშაო დღე"
-    },
-    {
-      title: "მიწოდება საქართველოს რეგიონებში",
-      description: "საქართველოს ფოსტა ან სატრანსპორტო კომპანიები",
-      time: "15-25 ლარი, 2-3 სამუშაო დღე"
-    }
-  ];
+  useDocumentTitle(c.title);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      
+
       <main className="max-w-[1504px] mx-auto py-8 px-4">
-        {/* Hero Section */}
         <div className="text-center mb-12">
           <div className="w-20 h-20 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-6">
             <i className="fas fa-balance-scale text-white text-3xl"></i>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4" data-testid="heading-rules">აუქციონის წესები</h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            გაეცანით პენი-აუქციონების წესებს და მონაწილეობის პირობებს
-          </p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4" data-testid="heading-rules">{c.heading}</h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">{c.subtitle}</p>
         </div>
 
-        {/* Main Rules */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-          {rulesSections.map((section, index) => (
+          {c.sections.map((section, index) => (
             <Card key={index} className="hover:shadow-lg transition-shadow" data-testid={`card-rules-${index}`}>
               <CardHeader>
                 <CardTitle className="flex items-center">
@@ -130,20 +326,17 @@ export default function AuctionRules() {
           ))}
         </div>
 
-        {/* Prohibited Actions */}
         <Card className="mb-12">
           <CardHeader>
             <CardTitle className="flex items-center text-red-600">
               <i className="fas fa-ban mr-3"></i>
-              აკრძალული ქმედებები
+              {c.prohibitedTitle}
             </CardTitle>
-            <CardDescription>
-              ამ წესების დარღვევა გამოიწვევს ანგარიშის დაბლოკვას თანხის დაბრუნების გარეშე
-            </CardDescription>
+            <CardDescription>{c.prohibitedDesc}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {prohibitedActions.map((action, index) => (
+              {c.prohibited.map((action, index) => (
                 <div key={index} className="flex items-start p-3 bg-red-50 rounded-lg border border-red-100" data-testid={`prohibited-${index}`}>
                   <i className="fas fa-times-circle text-red-500 mr-3 mt-1 flex-shrink-0"></i>
                   <span className="text-red-700">{action}</span>
@@ -153,62 +346,45 @@ export default function AuctionRules() {
           </CardContent>
         </Card>
 
-        {/* Delivery Rules */}
         <Card className="mb-12">
           <CardHeader>
             <CardTitle className="flex items-center">
               <i className="fas fa-shipping-fast text-blue-600 mr-3"></i>
-              მიწოდების წესები
+              {c.deliveryTitle}
             </CardTitle>
-            <CardDescription>
-              მოგებული პროდუქტების მიღების პირობები
-            </CardDescription>
+            <CardDescription>{c.deliveryDesc}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {deliveryRules.map((delivery, index) => (
+              {c.delivery.map((delivery, index) => (
                 <div key={index} className="text-center p-4 border rounded-lg hover:shadow-md transition-shadow" data-testid={`delivery-${index}`}>
                   <h3 className="font-semibold text-gray-900 mb-2">{delivery.title}</h3>
                   <p className="text-gray-600 mb-2">{delivery.description}</p>
-                  <Badge variant="outline" className="text-sm">
-                    {delivery.time}
-                  </Badge>
+                  <Badge variant="outline" className="text-sm">{delivery.time}</Badge>
                 </div>
               ))}
             </div>
           </CardContent>
         </Card>
 
-        {/* Important Notes */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
               <i className="fas fa-exclamation-triangle text-yellow-600 mr-3"></i>
-              მნიშვნელოვანი შენიშვნები
+              {c.notesTitle}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg" data-testid="note-responsibility">
-                <h3 className="font-semibold text-yellow-800 mb-2">მონაწილის პასუხისმგებლობა</h3>
-                <p className="text-yellow-700">
-                  აუქციონებში მონაწილეობით თქვენ ეთანხმებით, რომ გესმით პენი აუქციონების მუშაობის პრინციპი და იღებთ შესაძლო რისკებს.
-                </p>
-              </div>
-              
-              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg" data-testid="note-support">
-                <h3 className="font-semibold text-blue-800 mb-2">ტექნიკური მხარდაჭერა</h3>
-                <p className="text-blue-700">
-                  აუქციონის დროს ტექნიკური პრობლემების შემთხვევაში დაუყოვნებლივ დაუკავშირდით მხარდაჭერის სამსახურს. კომპენსაცია შესაძლებელია მხოლოდ დადასტურებული ტექნიკური პრობლემების შემთხვევაში.
-                </p>
-              </div>
-
-              <div className="p-4 bg-green-50 border border-green-200 rounded-lg" data-testid="note-fairplay">
-                <h3 className="font-semibold text-green-800 mb-2">სამართლიანი თამაში</h3>
-                <p className="text-green-700">
-                  QBIDS.GE ცდილობს უზრუნველყოს სამართლიანი და გამჭვირვალე აუქციონები ყველა მონაწილისთვის. ჩვენ მუდმივად ვაკონტროლებთ სისტემას თაღლითობის თავიდან ასაცილებლად.
-                </p>
-              </div>
+              {c.notes.map((note, index) => {
+                const styles = noteStyles[note.tone];
+                return (
+                  <div key={index} className={`p-4 border rounded-lg ${styles.box}`} data-testid={`note-${index}`}>
+                    <h3 className={`font-semibold mb-2 ${styles.title}`}>{note.title}</h3>
+                    <p className={styles.text}>{note.text}</p>
+                  </div>
+                );
+              })}
             </div>
           </CardContent>
         </Card>
